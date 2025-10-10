@@ -17,50 +17,6 @@ Aplicação Java desenvolvida com **Spring Boot**, **JPA (Hibernate)** e **Lombo
 
 ---
 
-## 🧩 Estrutura do Projeto
-
-
-
-src/main/java/org/example/
-│
-├── controller/
-│ ├── ContaController.java
-│ ├── ContaCorrenteController.java
-│ ├── ContaPoupancaController.java
-│ └── CorrentistaController.java
-│
-├── dto/
-│ └── ContaResponse.java
-│
-├── enums/
-│ └── TipoTransacao.java
-│
-├── exeption/
-│ ├── BusinessRuleException.java
-│ └── ResourceNotFoundException.java
-│
-├── model/
-│ ├── Conta.java
-│ ├── ContaCorrente.java
-│ ├── ContaPoupanca.java
-│ ├── Correntista.java
-│ └── Transacao.java
-│
-├── repository/
-│ ├── ContaRepository.java
-│ ├── CorrentistaRepository.java
-│ └── TransacaoRepository.java
-│
-└── service/
-├── ContaService.java
-├── ContaCorrenteService.java
-├── ContaPoupancaService.java
-├── CorrentistaService.java
-└── TransacaoService.java
-
-
----
-
 ## ⚙️ Configuração do Projeto
 
 ### 1️⃣ Clonar o repositório
