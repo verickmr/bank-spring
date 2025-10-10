@@ -8,9 +8,9 @@ Aplicação Java desenvolvida com **Spring Boot**, **JPA (Hibernate)** e **Lombo
 ## 🚀 Tecnologias Utilizadas
 
 - Java 8+
-- Spring Boot 3.x
+- Spring Boot 2.7
 - Spring Data JPA
-- H2 Database (ou MySQL, se configurado)
+- H2 Database 
 - Lombok
 - Maven
 - Postman (para testes de API)
