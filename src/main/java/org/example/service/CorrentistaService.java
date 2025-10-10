@@ -61,7 +61,6 @@ public class CorrentistaService {
         correntistaRepository.delete(existente);
     }
 
-    // 🔄 Conversão de Entidade → DTO
     private CorrentistaResponse toResponse(Correntista c) {
         List<ContaResponse> contas;
 

@@ -22,7 +22,6 @@ public class ContaController {
     private final ContaCorrenteService contaCorrenteService;
     private final ContaPoupancaService contaPoupancaService;
 
-    // ---------- CRUD ----------
     @GetMapping
     public ResponseEntity<?> listarContas() {
         return ResponseEntity.ok(contaService.listarContas());
@@ -39,7 +38,6 @@ public class ContaController {
         return ResponseEntity.noContent().build();
     }
 
-    // ---------- CRIAR CONTA DINÂMICA ----------
     @PostMapping("/{tipo}")
     public ResponseEntity<?> criarConta(
             @PathVariable String tipo,
@@ -72,7 +70,6 @@ public class ContaController {
         }
     }
 
-    // ---------- OPERAÇÕES ----------
     @PostMapping("/{tipo}/{id}/depositar")
     public ResponseEntity<?> depositar(
             @PathVariable String tipo,

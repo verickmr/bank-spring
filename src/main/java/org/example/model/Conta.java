@@ -24,6 +24,6 @@ public abstract class Conta {
 
     @ManyToOne
     @JoinColumn(name = "correntista_id")
-    @JsonBackReference // 👈 impede o loop inverso
+    @JsonBackReference
     private Correntista correntista;
 }

@@ -23,13 +23,11 @@ public class ContaPoupancaService {
     private final CorrentistaRepository correntistaRepository;
     private final TransacaoRepository transacaoRepository;
 
-    // 🔹 Buscar Correntista
     public Correntista buscarCorrentista(Long id) {
         return correntistaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Correntista não encontrado."));
     }
 
-    // 🔹 Criar conta poupança
     public ContaPoupanca salvar(ContaPoupanca conta) {
         return contaRepository.save(conta);
     }

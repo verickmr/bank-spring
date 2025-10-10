@@ -40,8 +40,6 @@ public class ContaService {
         Conta conta = buscarPorId(id);
         contaRepository.delete(conta);
     }
-
-    // -------- CONVERSÃO PARA DTO --------
     private ContaResponse toResponse(Conta conta) {
         return ContaResponse.builder()
                 .id(conta.getId())
