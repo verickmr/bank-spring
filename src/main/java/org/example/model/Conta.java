@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.exception.BusinessRuleException;
 
 import javax.persistence.*;
 
@@ -26,4 +27,21 @@ public abstract class Conta {
     @JoinColumn(name = "correntista_id")
     @JsonBackReference
     private Correntista correntista;
+
+    public void depositar(double valor) {
+        validarValorPositivo(
+                valor,
+                "O valor do depósito deve ser positivo."
+        );
+
+        saldo += valor;
+    }
+
+    public abstract void sacar(double valor);
+
+    protected void validarValorPositivo(double valor, String mensagem) {
+        if (valor <= 0) {
+            throw new BusinessRuleException(mensagem);
+        }
+    }
 }

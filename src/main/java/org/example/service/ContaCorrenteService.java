@@ -34,12 +34,10 @@ public class ContaCorrenteService {
 
     @Transactional
     public Transacao depositar(Long id, double valor) {
-        if (valor <= 0) throw new BusinessRuleException("O valor do depósito deve ser positivo.");
-
         ContaCorrente conta = (ContaCorrente) contaRepository.findById(id)
                 .orElseThrow(() -> new BusinessRuleException("Conta corrente não encontrada."));
 
-        conta.setSaldo(conta.getSaldo() + valor);
+        conta.depositar(valor);
         contaRepository.save(conta);
 
         return criarTransacao(conta, TipoTransacao.DEPOSITO, valor, "Depósito realizado.");
@@ -47,17 +45,10 @@ public class ContaCorrenteService {
 
     @Transactional
     public Transacao sacar(Long id, double valor) {
-        if (valor <= 0) throw new BusinessRuleException("O valor do saque deve ser positivo.");
-
         ContaCorrente conta = (ContaCorrente) contaRepository.findById(id)
                 .orElseThrow(() -> new BusinessRuleException("Conta corrente não encontrada."));
 
-        double limiteDisponivel = conta.getSaldo() + conta.getLimite();
-        if (valor > limiteDisponivel) {
-            throw new BusinessRuleException("Saldo insuficiente (saldo + limite).");
-        }
-
-        conta.setSaldo(conta.getSaldo() - valor);
+        conta.sacar(valor);
         contaRepository.save(conta);
 
         return criarTransacao(conta, TipoTransacao.SAQUE, valor, "Saque realizado.");

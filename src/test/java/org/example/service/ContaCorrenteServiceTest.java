@@ -113,6 +113,14 @@ class ContaCorrenteServiceTest {
     @ParameterizedTest
     @ValueSource(doubles = {0.0, -10.0})
     void deveRejeitarDepositoComValorNaoPositivo(double valor) {
+        ContaCorrente conta = new ContaCorrente();
+        conta.setId(1L);
+        conta.setSaldo(1000.00);
+        conta.setLimite(500.00);
+
+        when(contaRepository.findById(1L))
+                .thenReturn(Optional.of(conta));
+
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
                 () -> service.depositar(1L, valor)
@@ -122,8 +130,10 @@ class ContaCorrenteServiceTest {
                 "O valor do depósito deve ser positivo.",
                 exception.getMessage()
         );
+        assertEquals(1000.00, conta.getSaldo(), 0.001);
 
-        verifyNoInteractions(contaRepository, transacaoRepository);
+        verify(contaRepository, never()).save(any(Conta.class));
+        verify(transacaoRepository, never()).save(any(Transacao.class));
     }
 
     @Test

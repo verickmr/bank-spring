@@ -34,12 +34,10 @@ public class ContaPoupancaService {
 
     @Transactional
     public Transacao depositar(Long id, double valor) {
-        if (valor <= 0) throw new BusinessRuleException("O valor do depósito deve ser positivo.");
-
         ContaPoupanca conta = (ContaPoupanca) contaRepository.findById(id)
                 .orElseThrow(() -> new BusinessRuleException("Conta poupança não encontrada."));
 
-        conta.setSaldo(conta.getSaldo() + valor);
+        conta.depositar(valor);
         contaRepository.save(conta);
 
         return criarTransacao(conta, TipoTransacao.DEPOSITO, valor, "Depósito realizado.");
@@ -47,16 +45,10 @@ public class ContaPoupancaService {
 
     @Transactional
     public Transacao sacar(Long id, double valor) {
-        if (valor <= 0) throw new BusinessRuleException("O valor do saque deve ser positivo.");
-
         ContaPoupanca conta = (ContaPoupanca) contaRepository.findById(id)
                 .orElseThrow(() -> new BusinessRuleException("Conta poupança não encontrada."));
 
-        if (valor > conta.getSaldo()) {
-            throw new BusinessRuleException("Saldo insuficiente para saque na poupança.");
-        }
-
-        conta.setSaldo(conta.getSaldo() - valor);
+        conta.sacar(valor);
         contaRepository.save(conta);
 
         return criarTransacao(conta, TipoTransacao.SAQUE, valor, "Saque realizado.");
