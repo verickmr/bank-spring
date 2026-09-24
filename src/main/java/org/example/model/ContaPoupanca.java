@@ -28,4 +28,16 @@ public class ContaPoupanca extends Conta {
 
         saldo -= valor;
     }
+
+    public double aplicarRendimento(double taxa) {
+        validarValorPositivo(
+                taxa,
+                "A taxa de rendimento deve ser positiva."
+        );
+
+        double rendimento = saldo * taxa;
+        saldo += rendimento;
+
+        return rendimento;
+    }
 }

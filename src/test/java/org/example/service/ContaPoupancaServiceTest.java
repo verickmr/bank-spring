@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -106,6 +105,11 @@ class ContaPoupancaServiceTest {
     @ParameterizedTest
     @ValueSource(doubles = {0.0, -0.01})
     void deveRejeitarTaxaDeRendimentoNaoPositiva(double taxa) {
+        ContaPoupanca conta = criarConta(1000.00);
+
+        when(contaRepository.findById(1L))
+                .thenReturn(Optional.of(conta));
+
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
                 () -> service.aplicarRendimento(1L, taxa)
@@ -116,7 +120,9 @@ class ContaPoupancaServiceTest {
                 exception.getMessage()
         );
 
-        verifyNoInteractions(contaRepository, transacaoRepository);
+        assertEquals(1000.00, conta.getSaldo(), 0.001);
+        verify(contaRepository, never()).save(any(Conta.class));
+        verify(transacaoRepository, never()).save(any(Transacao.class));
     }
 
     private ContaPoupanca criarConta(double saldo) {

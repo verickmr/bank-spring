@@ -56,17 +56,20 @@ public class ContaPoupancaService {
 
     @Transactional
     public Transacao aplicarRendimento(Long id, double taxa) {
-        if (taxa <= 0) throw new BusinessRuleException("A taxa de rendimento deve ser positiva.");
-
         ContaPoupanca conta = (ContaPoupanca) contaRepository.findById(id)
-                .orElseThrow(() -> new BusinessRuleException("Conta poupança não encontrada."));
+                .orElseThrow(() ->
+                        new BusinessRuleException("Conta poupança não encontrada.")
+                );
 
-        double rendimento = conta.getSaldo() * taxa;
-        conta.setSaldo(conta.getSaldo() + rendimento);
+        double rendimento = conta.aplicarRendimento(taxa);
         contaRepository.save(conta);
 
-        return criarTransacao(conta, TipoTransacao.RENDIMENTO, rendimento,
-                "Rendimento aplicado (" + (taxa * 100) + "%).");
+        return criarTransacao(
+                conta,
+                TipoTransacao.RENDIMENTO,
+                rendimento,
+                "Rendimento aplicado (" + (taxa * 100) + "%)."
+        );
     }
 
     private Transacao criarTransacao(ContaPoupanca conta, TipoTransacao tipo, double valor, String descricao) {

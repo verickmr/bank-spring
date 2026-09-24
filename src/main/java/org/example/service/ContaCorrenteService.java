@@ -56,21 +56,20 @@ public class ContaCorrenteService {
 
     @Transactional
     public Transacao aplicarJuros(Long id, double taxa) {
-        if (taxa <= 0) throw new BusinessRuleException("A taxa de juros deve ser positiva.");
-
         ContaCorrente conta = (ContaCorrente) contaRepository.findById(id)
-                .orElseThrow(() -> new BusinessRuleException("Conta corrente não encontrada."));
+                .orElseThrow(() ->
+                        new BusinessRuleException("Conta corrente não encontrada.")
+                );
 
-        if (conta.getSaldo() >= 0) {
-            throw new BusinessRuleException("Juros só podem ser aplicados em saldo negativo.");
-        }
-
-        double juros = Math.abs(conta.getSaldo()) * taxa;
-        conta.setSaldo(conta.getSaldo() - juros);
+        double juros = conta.aplicarJuros(taxa);
         contaRepository.save(conta);
 
-        return criarTransacao(conta, TipoTransacao.JUROS, juros,
-                "Juros aplicados (" + (taxa * 100) + "%).");
+        return criarTransacao(
+                conta,
+                TipoTransacao.JUROS,
+                juros,
+                "Juros aplicados (" + (taxa * 100) + "%)."
+        );
     }
 
     private Transacao criarTransacao(ContaCorrente conta, TipoTransacao tipo, double valor, String descricao) {

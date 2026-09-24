@@ -187,6 +187,14 @@ class ContaCorrenteServiceTest {
     @ParameterizedTest
     @ValueSource(doubles = {0.0, -0.01})
     void deveRejeitarTaxaDeJurosNaoPositiva(double taxa) {
+        ContaCorrente conta = new ContaCorrente();
+        conta.setId(1L);
+        conta.setSaldo(-500.00);
+        conta.setLimite(500.00);
+
+        when(contaRepository.findById(1L))
+                .thenReturn(Optional.of(conta));
+
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
                 () -> service.aplicarJuros(1L, taxa)
@@ -197,6 +205,8 @@ class ContaCorrenteServiceTest {
                 exception.getMessage()
         );
 
-        verifyNoInteractions(contaRepository, transacaoRepository);
+        assertEquals(-500.00, conta.getSaldo(), 0.001);
+        verify(contaRepository, never()).save(any(Conta.class));
+        verify(transacaoRepository, never()).save(any(Transacao.class));
     }
 }

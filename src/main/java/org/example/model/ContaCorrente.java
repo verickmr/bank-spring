@@ -34,4 +34,22 @@ public class ContaCorrente extends Conta {
 
         saldo -= valor;
     }
+
+    public double aplicarJuros(double taxa) {
+        validarValorPositivo(
+                taxa,
+                "A taxa de juros deve ser positiva."
+        );
+
+        if (saldo >= 0) {
+            throw new BusinessRuleException(
+                    "Juros só podem ser aplicados em saldo negativo."
+            );
+        }
+
+        double juros = Math.abs(saldo) * taxa;
+        saldo -= juros;
+
+        return juros;
+    }
 }
