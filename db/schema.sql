@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS correntista (
     cpf VARCHAR(14) NOT NULL,
     nome VARCHAR(255),
     email VARCHAR(255),
+    senha VARCHAR(60) NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT uk_correntista_cpf UNIQUE (cpf)
 ) ENGINE=InnoDB;

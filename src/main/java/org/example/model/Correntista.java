@@ -1,5 +1,6 @@
 package org.example.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +28,10 @@ public class Correntista {
 
     private String nome;
     private String email;
+
+    @JsonIgnore
+    @Column(nullable = false, length = 60)
+    private String senha;
 
     @Builder.Default
     @OneToMany(mappedBy = "correntista", cascade = CascadeType.ALL)

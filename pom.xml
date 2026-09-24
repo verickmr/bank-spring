@@ -61,6 +61,12 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
+        <!-- Criptografia de senhas sem ativar a segurança HTTP nesta etapa -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+
         <!-- OpenAPI e Swagger UI -->
         <dependency>
             <groupId>org.springdoc</groupId>

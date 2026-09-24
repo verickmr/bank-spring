@@ -46,7 +46,8 @@ class CorrentistaControllerTest {
                         .content(
                                 "{\"cpf\":\"12345678900\","
                                         + "\"nome\":\"Victor Erick\","
-                                        + "\"email\":\"victor@email.com\"}"
+                                        + "\"email\":\"victor@email.com\","
+                                        + "\"senha\":\"senhaSegura123\"}"
                         ))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
@@ -63,7 +64,8 @@ class CorrentistaControllerTest {
                         .content(
                                 "{\"cpf\":\"123\","
                                         + "\"nome\":\"Victor Erick\","
-                                        + "\"email\":\"victor@email.com\"}"
+                                        + "\"email\":\"victor@email.com\","
+                                        + "\"senha\":\"senhaSegura123\"}"
                         ))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))

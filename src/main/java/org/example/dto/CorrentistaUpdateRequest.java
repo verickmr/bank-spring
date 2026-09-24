@@ -8,7 +8,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @Data
-public class CorrentistaRequest {
+public class CorrentistaUpdateRequest {
 
     @NotBlank(message = "O CPF é obrigatório.")
     @Pattern(regexp = "\\d{11}", message = "O CPF deve conter 11 dígitos.")
@@ -21,8 +21,4 @@ public class CorrentistaRequest {
     @NotBlank(message = "O e-mail é obrigatório.")
     @Email(message = "O e-mail informado é inválido.")
     private String email;
-
-    @NotBlank(message = "A senha é obrigatória.")
-    @Size(min = 8, max = 72, message = "A senha deve ter entre 8 e 72 caracteres.")
-    private String senha;
 }

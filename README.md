@@ -178,7 +178,8 @@ POST /api/correntistas
 {
   "cpf": "12345678900",
   "nome": "Victor Erick",
-  "email": "victor@email.com"
+  "email": "victor@email.com",
+  "senha": "senhaSegura123"
 }
 ```
 
