@@ -2,7 +2,7 @@ package org.example.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.dto.ContaResponse;
-import org.example.exeption.ResourceNotFoundException;
+import org.example.exception.ResourceNotFoundException;
 import org.example.model.Conta;
 import org.example.repository.ContaRepository;
 import org.springframework.stereotype.Service;

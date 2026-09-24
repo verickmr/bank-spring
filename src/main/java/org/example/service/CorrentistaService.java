@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.dto.CorrentistaRequest;
 import org.example.dto.CorrentistaResponse;
 import org.example.dto.ContaResponse;
-import org.example.exeption.ResourceNotFoundException;
+import org.example.exception.ResourceNotFoundException;
 import org.example.model.Correntista;
 import org.example.repository.CorrentistaRepository;
 import org.springframework.stereotype.Service;

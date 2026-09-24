@@ -2,8 +2,8 @@ package org.example.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.enums.TipoTransacao;
-import org.example.exeption.BusinessRuleException;
-import org.example.exeption.ResourceNotFoundException;
+import org.example.exception.BusinessRuleException;
+import org.example.exception.ResourceNotFoundException;
 import org.example.model.ContaCorrente;
 import org.example.model.Correntista;
 import org.example.model.Transacao;
