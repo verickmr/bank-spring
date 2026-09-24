@@ -1,15 +1,23 @@
 package org.example.dto;
 
 import lombok.Data;
-import org.example.enums.TipoConta;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 @Data
 public class ContaRequest {
-        private String numero;
-        private Double saldo;
-        private Double limite;
-        private Long correntistaId;
-        private TipoConta tipo;
-}
 
+    @NotBlank(message = "O número da conta é obrigatório.")
+    private String numero;
+
+    @PositiveOrZero(message = "O limite não pode ser negativo.")
+    private Double limite;
+
+    @NotNull(message = "O correntista é obrigatório.")
+    @Positive(message = "O identificador do correntista deve ser positivo.")
+    private Long correntistaId;
+}
 

@@ -10,6 +10,7 @@ import org.example.model.ContaPoupanca;
 import org.example.service.ContaCorrenteService;
 import org.example.service.ContaPoupancaService;
 import org.example.service.ContaService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,32 +44,40 @@ public class ContaController {
     @PostMapping("/{tipo}")
     public ResponseEntity<?> criarConta(
             @PathVariable String tipo,
-            @RequestBody ContaRequest dto
+            @Valid @RequestBody ContaRequest dto
     ) {
-        try {
-            TipoConta tipoConta = TipoConta.fromString(tipo);
+        switch (TipoConta.fromString(tipo)) {
+            case CORRENTE:
+                if (dto.getLimite() == null) {
+                    throw new IllegalArgumentException(
+                            "O limite é obrigatório para conta corrente."
+                    );
+                }
 
-            switch (tipoConta) {
-                case CORRENTE:
-                    ContaCorrente cc = new ContaCorrente();
-                    cc.setNumero(dto.getNumero());
-                    cc.setSaldo(dto.getSaldo());
-                    cc.setLimite(dto.getLimite());
-                    cc.setCorrentista(contaCorrenteService.buscarCorrentista(dto.getCorrentistaId()));
-                    return ResponseEntity.ok(contaCorrenteService.salvar(cc));
+                ContaCorrente contaCorrente = new ContaCorrente();
+                contaCorrente.setNumero(dto.getNumero());
+                contaCorrente.setSaldo(0.0);
+                contaCorrente.setLimite(dto.getLimite());
+                contaCorrente.setCorrentista(
+                        contaCorrenteService.buscarCorrentista(dto.getCorrentistaId())
+                );
 
-                case POUPANCA:
-                    ContaPoupanca cp = new ContaPoupanca();
-                    cp.setNumero(dto.getNumero());
-                    cp.setSaldo(dto.getSaldo());
-                    cp.setCorrentista(contaPoupancaService.buscarCorrentista(dto.getCorrentistaId()));
-                    return ResponseEntity.ok(contaPoupancaService.salvar(cp));
+                return ResponseEntity.status(HttpStatus.CREATED)
+                        .body(contaCorrenteService.salvar(contaCorrente));
 
-                default:
-                    return ResponseEntity.badRequest().body("Tipo de conta inválido.");
-            }
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            case POUPANCA:
+                ContaPoupanca contaPoupanca = new ContaPoupanca();
+                contaPoupanca.setNumero(dto.getNumero());
+                contaPoupanca.setSaldo(0.0);
+                contaPoupanca.setCorrentista(
+                        contaPoupancaService.buscarCorrentista(dto.getCorrentistaId())
+                );
+
+                return ResponseEntity.status(HttpStatus.CREATED)
+                        .body(contaPoupancaService.salvar(contaPoupanca));
+
+            default:
+                throw new IllegalArgumentException("Tipo de conta inválido.");
         }
     }
 
