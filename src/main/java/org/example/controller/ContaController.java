@@ -2,6 +2,8 @@ package org.example.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.dto.ContaRequest;
+import org.example.dto.TaxaRequest;
+import org.example.dto.ValorRequest;
 import org.example.enums.TipoConta;
 import org.example.model.ContaCorrente;
 import org.example.model.ContaPoupanca;
@@ -11,7 +13,7 @@ import org.example.service.ContaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/contas")
@@ -74,20 +76,19 @@ public class ContaController {
     public ResponseEntity<?> depositar(
             @PathVariable String tipo,
             @PathVariable Long id,
-            @RequestBody Map<String, Double> body
+            @Valid @RequestBody ValorRequest body
     ) {
-        double valor = body.getOrDefault("valor", 0.0);
-        try {
-            switch (TipoConta.fromString(tipo)) {
-                case CORRENTE:
-                    return ResponseEntity.ok(contaCorrenteService.depositar(id, valor));
-                case POUPANCA:
-                    return ResponseEntity.ok(contaPoupancaService.depositar(id, valor));
-                default:
-                    return ResponseEntity.badRequest().body("Tipo inválido.");
-            }
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        switch (TipoConta.fromString(tipo)) {
+            case CORRENTE:
+                return ResponseEntity.ok(
+                        contaCorrenteService.depositar(id, body.getValor())
+                );
+            case POUPANCA:
+                return ResponseEntity.ok(
+                        contaPoupancaService.depositar(id, body.getValor())
+                );
+            default:
+                throw new IllegalArgumentException("Tipo de conta inválido.");
         }
     }
 
@@ -95,20 +96,19 @@ public class ContaController {
     public ResponseEntity<?> sacar(
             @PathVariable String tipo,
             @PathVariable Long id,
-            @RequestBody Map<String, Double> body
+            @Valid @RequestBody ValorRequest body
     ) {
-        double valor = body.getOrDefault("valor", 0.0);
-        try {
-            switch (TipoConta.fromString(tipo)) {
-                case CORRENTE:
-                    return ResponseEntity.ok(contaCorrenteService.sacar(id, valor));
-                case POUPANCA:
-                    return ResponseEntity.ok(contaPoupancaService.sacar(id, valor));
-                default:
-                    return ResponseEntity.badRequest().body("Tipo inválido.");
-            }
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        switch (TipoConta.fromString(tipo)) {
+            case CORRENTE:
+                return ResponseEntity.ok(
+                        contaCorrenteService.sacar(id, body.getValor())
+                );
+            case POUPANCA:
+                return ResponseEntity.ok(
+                        contaPoupancaService.sacar(id, body.getValor())
+                );
+            default:
+                throw new IllegalArgumentException("Tipo de conta inválido.");
         }
     }
 
@@ -116,20 +116,19 @@ public class ContaController {
     public ResponseEntity<?> aplicarTaxa(
             @PathVariable String tipo,
             @PathVariable Long id,
-            @RequestBody Map<String, Double> body
+            @Valid @RequestBody TaxaRequest body
     ) {
-        double taxa = body.getOrDefault("taxa", 0.0);
-        try {
-            switch (TipoConta.fromString(tipo)) {
-                case CORRENTE:
-                    return ResponseEntity.ok(contaCorrenteService.aplicarJuros(id, taxa));
-                case POUPANCA:
-                    return ResponseEntity.ok(contaPoupancaService.aplicarRendimento(id, taxa));
-                default:
-                    return ResponseEntity.badRequest().body("Tipo inválido.");
-            }
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        switch (TipoConta.fromString(tipo)) {
+            case CORRENTE:
+                return ResponseEntity.ok(
+                        contaCorrenteService.aplicarJuros(id, body.getTaxa())
+                );
+            case POUPANCA:
+                return ResponseEntity.ok(
+                        contaPoupancaService.aplicarRendimento(id, body.getTaxa())
+                );
+            default:
+                throw new IllegalArgumentException("Tipo de conta inválido.");
         }
     }
 }
