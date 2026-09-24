@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.example.dto.CorrentistaRequest;
 import org.example.dto.CorrentistaResponse;
 import org.example.service.CorrentistaService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -27,14 +29,16 @@ public class CorrentistaController {
     }
 
     @PostMapping
-    public ResponseEntity<CorrentistaResponse> salvar(@RequestBody CorrentistaRequest dto) {
-        return ResponseEntity.ok(service.salvar(dto));
+    public ResponseEntity<CorrentistaResponse> salvar(
+            @Valid @RequestBody CorrentistaRequest dto) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(service.salvar(dto));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CorrentistaResponse> atualizar(
             @PathVariable Long id,
-            @RequestBody CorrentistaRequest dto) {
+            @Valid @RequestBody CorrentistaRequest dto) {
         return ResponseEntity.ok(service.atualizar(id, dto));
     }
 

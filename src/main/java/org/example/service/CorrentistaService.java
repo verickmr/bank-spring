@@ -4,13 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.example.dto.CorrentistaRequest;
 import org.example.dto.CorrentistaResponse;
 import org.example.dto.ContaResponse;
+import org.example.exception.ConflictException;
 import org.example.exception.ResourceNotFoundException;
 import org.example.model.Correntista;
 import org.example.repository.CorrentistaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,6 +22,7 @@ public class CorrentistaService {
 
     private final CorrentistaRepository correntistaRepository;
 
+    @Transactional(readOnly = true)
     public List<CorrentistaResponse> listarTodos() {
         return correntistaRepository.findAll()
                 .stream()
@@ -26,39 +30,55 @@ public class CorrentistaService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public CorrentistaResponse buscarPorId(Long id) {
         Correntista correntista = correntistaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Correntista não encontrado."));
         return toResponse(correntista);
     }
 
+    @Transactional
     public CorrentistaResponse salvar(CorrentistaRequest request) {
+        validarCpfDisponivel(request.getCpf());
+
         Correntista novo = Correntista.builder()
-                .cpf(request.getCpf())
-                .nome(request.getNome())
-                .email(request.getEmail())
+                .cpf(request.getCpf().trim())
+                .nome(request.getNome().trim())
+                .email(request.getEmail().trim().toLowerCase(Locale.ROOT))
                 .build();
 
         Correntista salvo = correntistaRepository.save(novo);
         return toResponse(salvo);
     }
 
+    @Transactional
     public CorrentistaResponse atualizar(Long id, CorrentistaRequest atualizado) {
         Correntista existente = correntistaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Correntista não encontrado."));
 
-        existente.setNome(atualizado.getNome());
-        existente.setCpf(atualizado.getCpf());
-        existente.setEmail(atualizado.getEmail());
+        if (correntistaRepository.existsByCpfAndIdNot(atualizado.getCpf(), id)) {
+            throw new ConflictException("Já existe um correntista com o CPF informado.");
+        }
+
+        existente.setNome(atualizado.getNome().trim());
+        existente.setCpf(atualizado.getCpf().trim());
+        existente.setEmail(atualizado.getEmail().trim().toLowerCase(Locale.ROOT));
 
         Correntista salvo = correntistaRepository.save(existente);
         return toResponse(salvo);
     }
 
+    @Transactional
     public void deletar(Long id) {
         Correntista existente = correntistaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Correntista não encontrado."));
         correntistaRepository.delete(existente);
+    }
+
+    private void validarCpfDisponivel(String cpf) {
+        if (correntistaRepository.existsByCpf(cpf)) {
+            throw new ConflictException("Já existe um correntista com o CPF informado.");
+        }
     }
 
     private CorrentistaResponse toResponse(Correntista c) {
