@@ -125,4 +125,68 @@ class ContaCorrenteServiceTest {
 
         verifyNoInteractions(contaRepository, transacaoRepository);
     }
+
+    @Test
+    void deveAplicarJurosSobreSaldoNegativo() {
+        ContaCorrente conta = new ContaCorrente();
+        conta.setId(1L);
+        conta.setSaldo(-500.00);
+        conta.setLimite(500.00);
+
+        when(contaRepository.findById(1L))
+                .thenReturn(Optional.of(conta));
+
+        when(transacaoRepository.save(any(Transacao.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Transacao transacao = service.aplicarJuros(1L, 0.02);
+
+        assertEquals(-510.00, conta.getSaldo(), 0.001);
+        assertEquals(10.00, transacao.getValor(), 0.001);
+        assertEquals(TipoTransacao.JUROS, transacao.getTipo());
+
+        verify(contaRepository).save(conta);
+        verify(transacaoRepository).save(any(Transacao.class));
+    }
+
+    @Test
+    void deveRejeitarJurosQuandoSaldoNaoForNegativo() {
+        ContaCorrente conta = new ContaCorrente();
+        conta.setId(1L);
+        conta.setSaldo(0.00);
+        conta.setLimite(500.00);
+
+        when(contaRepository.findById(1L))
+                .thenReturn(Optional.of(conta));
+
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.aplicarJuros(1L, 0.02)
+        );
+
+        assertEquals(
+                "Juros só podem ser aplicados em saldo negativo.",
+                exception.getMessage()
+        );
+        assertEquals(0.00, conta.getSaldo(), 0.001);
+
+        verify(contaRepository, never()).save(any(Conta.class));
+        verify(transacaoRepository, never()).save(any(Transacao.class));
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {0.0, -0.01})
+    void deveRejeitarTaxaDeJurosNaoPositiva(double taxa) {
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.aplicarJuros(1L, taxa)
+        );
+
+        assertEquals(
+                "A taxa de juros deve ser positiva.",
+                exception.getMessage()
+        );
+
+        verifyNoInteractions(contaRepository, transacaoRepository);
+    }
 }
