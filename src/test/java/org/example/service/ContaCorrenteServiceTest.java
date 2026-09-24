@@ -2,8 +2,10 @@ package org.example.service;
 
 import org.example.enums.TipoTransacao;
 import org.example.exception.BusinessRuleException;
+import org.example.exception.ResourceNotFoundException;
 import org.example.model.Conta;
 import org.example.model.ContaCorrente;
+import org.example.model.ContaPoupanca;
 import org.example.model.Transacao;
 import org.example.repository.ContaRepository;
 import org.example.repository.CorrentistaRepository;
@@ -179,6 +181,49 @@ class ContaCorrenteServiceTest {
                 exception.getMessage()
         );
         assertEquals(0.00, conta.getSaldo(), 0.001);
+
+        verify(contaRepository, never()).save(any(Conta.class));
+        verify(transacaoRepository, never()).save(any(Transacao.class));
+    }
+
+    @Test
+    void deveRejeitarOperacaoQuandoContaCorrenteNaoExistir() {
+        when(contaRepository.findById(99L))
+                .thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> service.depositar(99L, 100.00)
+        );
+
+        assertEquals(
+                "Conta corrente não encontrada.",
+                exception.getMessage()
+        );
+
+        verify(contaRepository, never()).save(any(Conta.class));
+        verify(transacaoRepository, never()).save(any(Transacao.class));
+    }
+
+    @Test
+    void deveRejeitarOperacaoQuandoContaNaoForCorrente() {
+        ContaPoupanca contaPoupanca = new ContaPoupanca();
+        contaPoupanca.setId(1L);
+        contaPoupanca.setSaldo(1000.00);
+
+        when(contaRepository.findById(1L))
+                .thenReturn(Optional.of(contaPoupanca));
+
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.depositar(1L, 100.00)
+        );
+
+        assertEquals(
+                "A conta informada não é uma conta corrente.",
+                exception.getMessage()
+        );
+        assertEquals(1000.00, contaPoupanca.getSaldo(), 0.001);
 
         verify(contaRepository, never()).save(any(Conta.class));
         verify(transacaoRepository, never()).save(any(Transacao.class));

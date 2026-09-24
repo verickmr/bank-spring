@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.enums.TipoTransacao;
 import org.example.exception.BusinessRuleException;
 import org.example.exception.ResourceNotFoundException;
+import org.example.model.Conta;
 import org.example.model.ContaPoupanca;
 import org.example.model.Correntista;
 import org.example.model.Transacao;
@@ -28,14 +29,28 @@ public class ContaPoupancaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Correntista não encontrado."));
     }
 
+    private ContaPoupanca buscarContaPoupanca(Long id) {
+        Conta conta = contaRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Conta poupança não encontrada.")
+                );
+
+        if (!(conta instanceof ContaPoupanca)) {
+            throw new BusinessRuleException(
+                    "A conta informada não é uma conta poupança."
+            );
+        }
+
+        return (ContaPoupanca) conta;
+    }
+
     public ContaPoupanca salvar(ContaPoupanca conta) {
         return contaRepository.save(conta);
     }
 
     @Transactional
     public Transacao depositar(Long id, double valor) {
-        ContaPoupanca conta = (ContaPoupanca) contaRepository.findById(id)
-                .orElseThrow(() -> new BusinessRuleException("Conta poupança não encontrada."));
+        ContaPoupanca conta = buscarContaPoupanca(id);
 
         conta.depositar(valor);
         contaRepository.save(conta);
@@ -45,8 +60,7 @@ public class ContaPoupancaService {
 
     @Transactional
     public Transacao sacar(Long id, double valor) {
-        ContaPoupanca conta = (ContaPoupanca) contaRepository.findById(id)
-                .orElseThrow(() -> new BusinessRuleException("Conta poupança não encontrada."));
+        ContaPoupanca conta = buscarContaPoupanca(id);
 
         conta.sacar(valor);
         contaRepository.save(conta);
@@ -56,10 +70,7 @@ public class ContaPoupancaService {
 
     @Transactional
     public Transacao aplicarRendimento(Long id, double taxa) {
-        ContaPoupanca conta = (ContaPoupanca) contaRepository.findById(id)
-                .orElseThrow(() ->
-                        new BusinessRuleException("Conta poupança não encontrada.")
-                );
+        ContaPoupanca conta = buscarContaPoupanca(id);
 
         double rendimento = conta.aplicarRendimento(taxa);
         contaRepository.save(conta);

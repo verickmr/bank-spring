@@ -2,7 +2,9 @@ package org.example.service;
 
 import org.example.enums.TipoTransacao;
 import org.example.exception.BusinessRuleException;
+import org.example.exception.ResourceNotFoundException;
 import org.example.model.Conta;
+import org.example.model.ContaCorrente;
 import org.example.model.ContaPoupanca;
 import org.example.model.Transacao;
 import org.example.repository.ContaRepository;
@@ -100,6 +102,50 @@ class ContaPoupancaServiceTest {
 
         verify(contaRepository).save(conta);
         verify(transacaoRepository).save(any(Transacao.class));
+    }
+
+    @Test
+    void deveRejeitarOperacaoQuandoContaPoupancaNaoExistir() {
+        when(contaRepository.findById(99L))
+                .thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> service.depositar(99L, 100.00)
+        );
+
+        assertEquals(
+                "Conta poupança não encontrada.",
+                exception.getMessage()
+        );
+
+        verify(contaRepository, never()).save(any(Conta.class));
+        verify(transacaoRepository, never()).save(any(Transacao.class));
+    }
+
+    @Test
+    void deveRejeitarOperacaoQuandoContaNaoForPoupanca() {
+        ContaCorrente contaCorrente = new ContaCorrente();
+        contaCorrente.setId(1L);
+        contaCorrente.setSaldo(1000.00);
+        contaCorrente.setLimite(500.00);
+
+        when(contaRepository.findById(1L))
+                .thenReturn(Optional.of(contaCorrente));
+
+        BusinessRuleException exception = assertThrows(
+                BusinessRuleException.class,
+                () -> service.depositar(1L, 100.00)
+        );
+
+        assertEquals(
+                "A conta informada não é uma conta poupança.",
+                exception.getMessage()
+        );
+        assertEquals(1000.00, contaCorrente.getSaldo(), 0.001);
+
+        verify(contaRepository, never()).save(any(Conta.class));
+        verify(transacaoRepository, never()).save(any(Transacao.class));
     }
 
     @ParameterizedTest

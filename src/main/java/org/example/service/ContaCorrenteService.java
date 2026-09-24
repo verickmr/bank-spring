@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.enums.TipoTransacao;
 import org.example.exception.BusinessRuleException;
 import org.example.exception.ResourceNotFoundException;
+import org.example.model.Conta;
 import org.example.model.ContaCorrente;
 import org.example.model.Correntista;
 import org.example.model.Transacao;
@@ -28,14 +29,28 @@ public class ContaCorrenteService {
                 .orElseThrow(() -> new ResourceNotFoundException("Correntista não encontrado."));
     }
 
+    private ContaCorrente buscarContaCorrente(Long id) {
+        Conta conta = contaRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Conta corrente não encontrada.")
+                );
+
+        if (!(conta instanceof ContaCorrente)) {
+            throw new BusinessRuleException(
+                    "A conta informada não é uma conta corrente."
+            );
+        }
+
+        return (ContaCorrente) conta;
+    }
+
     public ContaCorrente salvar(ContaCorrente conta) {
         return contaRepository.save(conta);
     }
 
     @Transactional
     public Transacao depositar(Long id, double valor) {
-        ContaCorrente conta = (ContaCorrente) contaRepository.findById(id)
-                .orElseThrow(() -> new BusinessRuleException("Conta corrente não encontrada."));
+        ContaCorrente conta = buscarContaCorrente(id);
 
         conta.depositar(valor);
         contaRepository.save(conta);
@@ -45,8 +60,7 @@ public class ContaCorrenteService {
 
     @Transactional
     public Transacao sacar(Long id, double valor) {
-        ContaCorrente conta = (ContaCorrente) contaRepository.findById(id)
-                .orElseThrow(() -> new BusinessRuleException("Conta corrente não encontrada."));
+        ContaCorrente conta = buscarContaCorrente(id);
 
         conta.sacar(valor);
         contaRepository.save(conta);
@@ -56,10 +70,7 @@ public class ContaCorrenteService {
 
     @Transactional
     public Transacao aplicarJuros(Long id, double taxa) {
-        ContaCorrente conta = (ContaCorrente) contaRepository.findById(id)
-                .orElseThrow(() ->
-                        new BusinessRuleException("Conta corrente não encontrada.")
-                );
+        ContaCorrente conta = buscarContaCorrente(id);
 
         double juros = conta.aplicarJuros(taxa);
         contaRepository.save(conta);
