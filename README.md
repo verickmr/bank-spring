@@ -14,6 +14,7 @@ O sistema gerencia correntistas, contas correntes, contas poupança e transaçõ
 - Bloqueio de saldo negativo em conta poupança
 - Aplicação de juros sobre saldo negativo da conta corrente
 - Aplicação de rendimento na conta poupança
+- Precisão monetária com `BigDecimal` e arredondamento bancário
 - Validação das requisições
 - Tratamento padronizado de erros
 - Documentação interativa com Swagger
@@ -29,6 +30,7 @@ O sistema gerencia correntistas, contas correntes, contas poupança e transaçõ
 - Spring Data JPA
 - Hibernate
 - Bean Validation
+- BigDecimal para valores monetários
 - H2 Database
 - MySQL 8
 - Docker Compose
@@ -319,6 +321,7 @@ O projeto está organizado nas seguintes responsabilidades:
 - `Conta` é uma classe abstrata especializada por `ContaCorrente` e `ContaPoupanca`.
 - A herança é persistida com a estratégia JPA `JOINED`.
 - As regras financeiras ficam nas entidades para preservar o encapsulamento do domínio.
+- Valores monetários usam `BigDecimal`, duas casas decimais e arredondamento `HALF_EVEN`.
 - Os serviços utilizam transações para manter a atualização do saldo e o registro da operação consistentes.
 - O perfil H2 facilita a execução local e os testes.
 - O perfil MySQL aproxima a aplicação de um ambiente real.

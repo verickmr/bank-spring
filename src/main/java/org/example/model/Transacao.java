@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.example.enums.TipoTransacao;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -27,7 +28,8 @@ public class Transacao {
     @Enumerated(EnumType.STRING)
     private TipoTransacao tipo;
 
-    private double valor;
+    @Column(nullable = false, precision = 19, scale = 2)
+    private BigDecimal valor;
 
     private LocalDateTime data;
 

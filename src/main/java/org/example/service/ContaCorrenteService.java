@@ -14,6 +14,7 @@ import org.example.repository.TransacaoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -49,7 +50,7 @@ public class ContaCorrenteService {
     }
 
     @Transactional
-    public Transacao depositar(Long id, double valor) {
+    public Transacao depositar(Long id, BigDecimal valor) {
         ContaCorrente conta = buscarContaCorrente(id);
 
         conta.depositar(valor);
@@ -59,7 +60,7 @@ public class ContaCorrenteService {
     }
 
     @Transactional
-    public Transacao sacar(Long id, double valor) {
+    public Transacao sacar(Long id, BigDecimal valor) {
         ContaCorrente conta = buscarContaCorrente(id);
 
         conta.sacar(valor);
@@ -69,21 +70,21 @@ public class ContaCorrenteService {
     }
 
     @Transactional
-    public Transacao aplicarJuros(Long id, double taxa) {
+    public Transacao aplicarJuros(Long id, BigDecimal taxa) {
         ContaCorrente conta = buscarContaCorrente(id);
 
-        double juros = conta.aplicarJuros(taxa);
+        BigDecimal juros = conta.aplicarJuros(taxa);
         contaRepository.save(conta);
 
         return criarTransacao(
                 conta,
                 TipoTransacao.JUROS,
                 juros,
-                "Juros aplicados (" + (taxa * 100) + "%)."
+                "Juros aplicados (" + formatarPercentual(taxa) + "%)."
         );
     }
 
-    private Transacao criarTransacao(ContaCorrente conta, TipoTransacao tipo, double valor, String descricao) {
+    private Transacao criarTransacao(ContaCorrente conta, TipoTransacao tipo, BigDecimal valor, String descricao) {
         Transacao transacao = Transacao.builder()
                 .conta(conta)
                 .tipo(tipo)
@@ -93,5 +94,11 @@ public class ContaCorrenteService {
                 .build();
 
         return transacaoRepository.save(transacao);
+    }
+
+    private String formatarPercentual(BigDecimal taxa) {
+        return taxa.multiply(BigDecimal.valueOf(100))
+                .stripTrailingZeros()
+                .toPlainString();
     }
 }

@@ -14,6 +14,7 @@ import org.example.repository.TransacaoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -49,7 +50,7 @@ public class ContaPoupancaService {
     }
 
     @Transactional
-    public Transacao depositar(Long id, double valor) {
+    public Transacao depositar(Long id, BigDecimal valor) {
         ContaPoupanca conta = buscarContaPoupanca(id);
 
         conta.depositar(valor);
@@ -59,7 +60,7 @@ public class ContaPoupancaService {
     }
 
     @Transactional
-    public Transacao sacar(Long id, double valor) {
+    public Transacao sacar(Long id, BigDecimal valor) {
         ContaPoupanca conta = buscarContaPoupanca(id);
 
         conta.sacar(valor);
@@ -69,21 +70,21 @@ public class ContaPoupancaService {
     }
 
     @Transactional
-    public Transacao aplicarRendimento(Long id, double taxa) {
+    public Transacao aplicarRendimento(Long id, BigDecimal taxa) {
         ContaPoupanca conta = buscarContaPoupanca(id);
 
-        double rendimento = conta.aplicarRendimento(taxa);
+        BigDecimal rendimento = conta.aplicarRendimento(taxa);
         contaRepository.save(conta);
 
         return criarTransacao(
                 conta,
                 TipoTransacao.RENDIMENTO,
                 rendimento,
-                "Rendimento aplicado (" + (taxa * 100) + "%)."
+                "Rendimento aplicado (" + formatarPercentual(taxa) + "%)."
         );
     }
 
-    private Transacao criarTransacao(ContaPoupanca conta, TipoTransacao tipo, double valor, String descricao) {
+    private Transacao criarTransacao(ContaPoupanca conta, TipoTransacao tipo, BigDecimal valor, String descricao) {
         Transacao transacao = Transacao.builder()
                 .conta(conta)
                 .tipo(tipo)
@@ -93,5 +94,11 @@ public class ContaPoupancaService {
                 .build();
 
         return transacaoRepository.save(transacao);
+    }
+
+    private String formatarPercentual(BigDecimal taxa) {
+        return taxa.multiply(BigDecimal.valueOf(100))
+                .stripTrailingZeros()
+                .toPlainString();
     }
 }

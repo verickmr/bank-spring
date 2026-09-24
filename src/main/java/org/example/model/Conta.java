@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.example.exception.BusinessRuleException;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -21,26 +23,27 @@ public abstract class Conta {
 
     private String numero;
 
-    protected double saldo;
+    @Column(nullable = false, precision = 19, scale = 2)
+    protected BigDecimal saldo = BigDecimal.ZERO.setScale(2);
 
     @ManyToOne
     @JoinColumn(name = "correntista_id")
     @JsonBackReference
     private Correntista correntista;
 
-    public void depositar(double valor) {
+    public void depositar(BigDecimal valor) {
         validarValorPositivo(
                 valor,
                 "O valor do depósito deve ser positivo."
         );
 
-        saldo += valor;
+        saldo = saldo.add(valor).setScale(2, RoundingMode.HALF_EVEN);
     }
 
-    public abstract void sacar(double valor);
+    public abstract void sacar(BigDecimal valor);
 
-    protected void validarValorPositivo(double valor, String mensagem) {
-        if (valor <= 0) {
+    protected void validarValorPositivo(BigDecimal valor, String mensagem) {
+        if (valor == null || valor.signum() <= 0) {
             throw new BusinessRuleException(mensagem);
         }
     }

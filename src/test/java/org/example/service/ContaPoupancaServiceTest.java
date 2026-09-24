@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,7 +45,7 @@ class ContaPoupancaServiceTest {
 
     @Test
     void devePermitirSaqueAteOSaldoDisponivel() {
-        ContaPoupanca conta = criarConta(1000.00);
+        ContaPoupanca conta = criarConta("1000.00");
 
         when(contaRepository.findById(1L))
                 .thenReturn(Optional.of(conta));
@@ -52,10 +53,10 @@ class ContaPoupancaServiceTest {
         when(transacaoRepository.save(any(Transacao.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        Transacao transacao = service.sacar(1L, 1000.00);
+        Transacao transacao = service.sacar(1L, decimal("1000.00"));
 
-        assertEquals(0.00, conta.getSaldo(), 0.001);
-        assertEquals(1000.00, transacao.getValor(), 0.001);
+        assertEquals(decimal("0.00"), conta.getSaldo());
+        assertEquals(decimal("1000.00"), transacao.getValor());
         assertEquals(TipoTransacao.SAQUE, transacao.getTipo());
 
         verify(contaRepository).save(conta);
@@ -64,21 +65,21 @@ class ContaPoupancaServiceTest {
 
     @Test
     void deveRejeitarSaqueAcimaDoSaldo() {
-        ContaPoupanca conta = criarConta(1000.00);
+        ContaPoupanca conta = criarConta("1000.00");
 
         when(contaRepository.findById(1L))
                 .thenReturn(Optional.of(conta));
 
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
-                () -> service.sacar(1L, 1000.01)
+                () -> service.sacar(1L, decimal("1000.01"))
         );
 
         assertEquals(
                 "Saldo insuficiente para saque na poupança.",
                 exception.getMessage()
         );
-        assertEquals(1000.00, conta.getSaldo(), 0.001);
+        assertEquals(decimal("1000.00"), conta.getSaldo());
 
         verify(contaRepository, never()).save(any(Conta.class));
         verify(transacaoRepository, never()).save(any(Transacao.class));
@@ -86,7 +87,7 @@ class ContaPoupancaServiceTest {
 
     @Test
     void deveAplicarRendimentoAoSaldo() {
-        ContaPoupanca conta = criarConta(1000.00);
+        ContaPoupanca conta = criarConta("1000.00");
 
         when(contaRepository.findById(1L))
                 .thenReturn(Optional.of(conta));
@@ -94,10 +95,10 @@ class ContaPoupancaServiceTest {
         when(transacaoRepository.save(any(Transacao.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        Transacao transacao = service.aplicarRendimento(1L, 0.05);
+        Transacao transacao = service.aplicarRendimento(1L, decimal("0.05"));
 
-        assertEquals(1050.00, conta.getSaldo(), 0.001);
-        assertEquals(50.00, transacao.getValor(), 0.001);
+        assertEquals(decimal("1050.00"), conta.getSaldo());
+        assertEquals(decimal("50.00"), transacao.getValor());
         assertEquals(TipoTransacao.RENDIMENTO, transacao.getTipo());
 
         verify(contaRepository).save(conta);
@@ -111,7 +112,7 @@ class ContaPoupancaServiceTest {
 
         ResourceNotFoundException exception = assertThrows(
                 ResourceNotFoundException.class,
-                () -> service.depositar(99L, 100.00)
+                () -> service.depositar(99L, decimal("100.00"))
         );
 
         assertEquals(
@@ -127,38 +128,38 @@ class ContaPoupancaServiceTest {
     void deveRejeitarOperacaoQuandoContaNaoForPoupanca() {
         ContaCorrente contaCorrente = new ContaCorrente();
         contaCorrente.setId(1L);
-        contaCorrente.setSaldo(1000.00);
-        contaCorrente.setLimite(500.00);
+        contaCorrente.setSaldo(decimal("1000.00"));
+        contaCorrente.setLimite(decimal("500.00"));
 
         when(contaRepository.findById(1L))
                 .thenReturn(Optional.of(contaCorrente));
 
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
-                () -> service.depositar(1L, 100.00)
+                () -> service.depositar(1L, decimal("100.00"))
         );
 
         assertEquals(
                 "A conta informada não é uma conta poupança.",
                 exception.getMessage()
         );
-        assertEquals(1000.00, contaCorrente.getSaldo(), 0.001);
+        assertEquals(decimal("1000.00"), contaCorrente.getSaldo());
 
         verify(contaRepository, never()).save(any(Conta.class));
         verify(transacaoRepository, never()).save(any(Transacao.class));
     }
 
     @ParameterizedTest
-    @ValueSource(doubles = {0.0, -0.01})
-    void deveRejeitarTaxaDeRendimentoNaoPositiva(double taxa) {
-        ContaPoupanca conta = criarConta(1000.00);
+    @ValueSource(strings = {"0.00", "-0.01"})
+    void deveRejeitarTaxaDeRendimentoNaoPositiva(String taxa) {
+        ContaPoupanca conta = criarConta("1000.00");
 
         when(contaRepository.findById(1L))
                 .thenReturn(Optional.of(conta));
 
         BusinessRuleException exception = assertThrows(
                 BusinessRuleException.class,
-                () -> service.aplicarRendimento(1L, taxa)
+                () -> service.aplicarRendimento(1L, decimal(taxa))
         );
 
         assertEquals(
@@ -166,15 +167,18 @@ class ContaPoupancaServiceTest {
                 exception.getMessage()
         );
 
-        assertEquals(1000.00, conta.getSaldo(), 0.001);
+        assertEquals(decimal("1000.00"), conta.getSaldo());
         verify(contaRepository, never()).save(any(Conta.class));
         verify(transacaoRepository, never()).save(any(Transacao.class));
     }
 
-    private ContaPoupanca criarConta(double saldo) {
+    private ContaPoupanca criarConta(String saldo) {
         ContaPoupanca conta = new ContaPoupanca();
         conta.setId(1L);
-        conta.setSaldo(saldo);
+        conta.setSaldo(decimal(saldo));
         return conta;
+    }
+    private BigDecimal decimal(String valor) {
+        return new BigDecimal(valor);
     }
 }

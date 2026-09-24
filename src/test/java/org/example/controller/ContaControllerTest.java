@@ -13,6 +13,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -59,7 +61,7 @@ class ContaControllerTest {
                 ArgumentCaptor.forClass(ContaCorrente.class);
 
         verify(contaCorrenteService).salvar(contaCaptor.capture());
-        assertEquals(0.0, contaCaptor.getValue().getSaldo(), 0.001);
+        assertEquals(new BigDecimal("0.00"), contaCaptor.getValue().getSaldo());
     }
 
     @Test
@@ -108,6 +110,18 @@ class ContaControllerTest {
                         .content("{\"valor\": 0}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("O valor deve ser positivo."));
+
+        verificarServicosSemInteracao();
+    }
+
+    @Test
+    void deveRejeitarValorComMaisDeDuasCasasDecimais() throws Exception {
+        mockMvc.perform(post("/api/contas/corrente/1/depositar")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"valor\": 10.001}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message")
+                        .value("O valor deve ter no máximo duas casas decimais."));
 
         verificarServicosSemInteracao();
     }

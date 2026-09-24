@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import org.example.exception.BusinessRuleException;
 
 import javax.persistence.Entity;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Entity
 @Data
@@ -14,29 +16,30 @@ import javax.persistence.Entity;
 
 public class ContaPoupanca extends Conta {
     @Override
-    public void sacar(double valor) {
+    public void sacar(BigDecimal valor) {
         validarValorPositivo(
                 valor,
                 "O valor do saque deve ser positivo."
         );
 
-        if (valor > saldo) {
+        if (valor.compareTo(saldo) > 0) {
             throw new BusinessRuleException(
                     "Saldo insuficiente para saque na poupança."
             );
         }
 
-        saldo -= valor;
+        saldo = saldo.subtract(valor).setScale(2, RoundingMode.HALF_EVEN);
     }
 
-    public double aplicarRendimento(double taxa) {
+    public BigDecimal aplicarRendimento(BigDecimal taxa) {
         validarValorPositivo(
                 taxa,
                 "A taxa de rendimento deve ser positiva."
         );
 
-        double rendimento = saldo * taxa;
-        saldo += rendimento;
+        BigDecimal rendimento = saldo.multiply(taxa)
+                .setScale(2, RoundingMode.HALF_EVEN);
+        saldo = saldo.add(rendimento).setScale(2, RoundingMode.HALF_EVEN);
 
         return rendimento;
     }

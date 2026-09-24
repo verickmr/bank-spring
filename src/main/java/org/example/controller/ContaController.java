@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/contas")
@@ -66,7 +67,7 @@ public class ContaController {
 
                 ContaCorrente contaCorrente = new ContaCorrente();
                 contaCorrente.setNumero(dto.getNumero());
-                contaCorrente.setSaldo(0.0);
+                contaCorrente.setSaldo(BigDecimal.ZERO.setScale(2));
                 contaCorrente.setLimite(dto.getLimite());
                 contaCorrente.setCorrentista(
                         contaCorrenteService.buscarCorrentista(dto.getCorrentistaId())
@@ -78,7 +79,7 @@ public class ContaController {
             case POUPANCA:
                 ContaPoupanca contaPoupanca = new ContaPoupanca();
                 contaPoupanca.setNumero(dto.getNumero());
-                contaPoupanca.setSaldo(0.0);
+                contaPoupanca.setSaldo(BigDecimal.ZERO.setScale(2));
                 contaPoupanca.setCorrentista(
                         contaPoupancaService.buscarCorrentista(dto.getCorrentistaId())
                 );

@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS correntista (
 CREATE TABLE IF NOT EXISTS conta (
     id BIGINT NOT NULL AUTO_INCREMENT,
     numero VARCHAR(255),
-    saldo DOUBLE NOT NULL,
+    saldo DECIMAL(19,2) NOT NULL,
     correntista_id BIGINT,
     PRIMARY KEY (id),
     CONSTRAINT fk_conta_correntista
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS conta (
 
 CREATE TABLE IF NOT EXISTS conta_corrente (
     id BIGINT NOT NULL,
-    limite DOUBLE NOT NULL,
+    limite DECIMAL(19,2) NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT fk_conta_corrente_conta
         FOREIGN KEY (id) REFERENCES conta (id)
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS transacao (
     id BIGINT NOT NULL AUTO_INCREMENT,
     conta_id BIGINT,
     tipo VARCHAR(30),
-    valor DOUBLE NOT NULL,
+    valor DECIMAL(19,2) NOT NULL,
     data DATETIME(6),
     descricao VARCHAR(255),
     PRIMARY KEY (id),
