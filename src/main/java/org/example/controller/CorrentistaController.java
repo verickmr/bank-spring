@@ -1,5 +1,7 @@
 package org.example.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.CorrentistaRequest;
 import org.example.dto.CorrentistaResponse;
@@ -14,20 +16,27 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/correntistas")
 @RequiredArgsConstructor
+@Tag(
+        name = "Correntistas",
+        description = "Cadastro e gerenciamento dos correntistas da cooperativa."
+)
 public class CorrentistaController {
 
     private final CorrentistaService service;
 
+    @Operation(summary = "Lista todos os correntistas")
     @GetMapping
     public ResponseEntity<List<CorrentistaResponse>> listarTodos() {
         return ResponseEntity.ok(service.listarTodos());
     }
 
+    @Operation(summary = "Busca um correntista pelo ID")
     @GetMapping("/{id}")
     public ResponseEntity<CorrentistaResponse> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(service.buscarPorId(id));
     }
 
+    @Operation(summary = "Cadastra um novo correntista")
     @PostMapping
     public ResponseEntity<CorrentistaResponse> salvar(
             @Valid @RequestBody CorrentistaRequest dto) {
@@ -35,6 +44,7 @@ public class CorrentistaController {
                 .body(service.salvar(dto));
     }
 
+    @Operation(summary = "Atualiza os dados de um correntista")
     @PutMapping("/{id}")
     public ResponseEntity<CorrentistaResponse> atualizar(
             @PathVariable Long id,
@@ -42,6 +52,7 @@ public class CorrentistaController {
         return ResponseEntity.ok(service.atualizar(id, dto));
     }
 
+    @Operation(summary = "Exclui um correntista")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         service.deletar(id);
