@@ -61,6 +61,13 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
+        <!-- OpenAPI e Swagger UI -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>1.8.0</version>
+        </dependency>
+
         <!-- Lombok (opcional) -->
         <dependency>
             <groupId>org.projectlombok</groupId>
