@@ -17,7 +17,7 @@ import java.util.List;
 @Builder
 public class Correntista {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true, nullable = false)
