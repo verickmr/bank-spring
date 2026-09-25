@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.CorrentistaRequest;
@@ -42,6 +43,7 @@ public class CorrentistaController {
     }
 
     @Operation(summary = "Cadastra um novo correntista")
+    @SecurityRequirements
     @PostMapping
     public ResponseEntity<CorrentistaResponse> salvar(
             @Valid @RequestBody CorrentistaRequest dto) {

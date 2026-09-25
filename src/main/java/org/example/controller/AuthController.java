@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.LoginRequest;
@@ -24,6 +25,7 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(summary = "Autentica um correntista e retorna um JWT")
+    @SecurityRequirements
     public ResponseEntity<TokenResponse> login(
             @Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
