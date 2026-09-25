@@ -2,6 +2,7 @@ package org.example.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.dto.LoginRequest;
+import org.example.dto.TokenResponse;
 import org.example.exception.UnauthorizedException;
 import org.example.model.Correntista;
 import org.example.repository.CorrentistaRepository;
@@ -17,9 +18,16 @@ public class AuthService {
 
     private final CorrentistaRepository correntistaRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     @Transactional(readOnly = true)
-    public Correntista autenticar(LoginRequest request) {
+    public TokenResponse login(LoginRequest request) {
+        Correntista correntista = validarCredenciais(request);
+        String token = jwtService.gerarToken(correntista);
+        return new TokenResponse(token, "Bearer");
+    }
+
+    private Correntista validarCredenciais(LoginRequest request) {
         Correntista correntista = correntistaRepository
                 .findByCpf(request.getCpf().trim())
                 .orElseThrow(() -> new UnauthorizedException(CREDENCIAIS_INVALIDAS));

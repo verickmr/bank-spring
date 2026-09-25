@@ -1,6 +1,7 @@
 package org.example.service;
 
 import org.example.dto.LoginRequest;
+import org.example.dto.TokenResponse;
 import org.example.exception.UnauthorizedException;
 import org.example.model.Correntista;
 import org.example.repository.CorrentistaRepository;
@@ -14,7 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -29,6 +29,9 @@ class AuthServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private JwtService jwtService;
+
     @InjectMocks
     private AuthService service;
 
@@ -41,11 +44,15 @@ class AuthServiceTest {
                 .thenReturn(Optional.of(correntista));
         when(passwordEncoder.matches("senhaSegura123", "$2a$10$hash"))
                 .thenReturn(true);
+        when(jwtService.gerarToken(correntista))
+                .thenReturn("token-assinado");
 
-        Correntista autenticado = service.autenticar(request);
+        TokenResponse response = service.login(request);
 
-        assertSame(correntista, autenticado);
+        assertEquals("token-assinado", response.getToken());
+        assertEquals("Bearer", response.getTipo());
         verify(passwordEncoder).matches("senhaSegura123", "$2a$10$hash");
+        verify(jwtService).gerarToken(correntista);
     }
 
     @Test
@@ -60,7 +67,7 @@ class AuthServiceTest {
 
         UnauthorizedException exception = assertThrows(
                 UnauthorizedException.class,
-                () -> service.autenticar(request)
+                () -> service.login(request)
         );
 
         assertEquals("CPF ou senha inválidos.", exception.getMessage());
@@ -75,7 +82,7 @@ class AuthServiceTest {
 
         UnauthorizedException exception = assertThrows(
                 UnauthorizedException.class,
-                () -> service.autenticar(request)
+                () -> service.login(request)
         );
 
         assertEquals("CPF ou senha inválidos.", exception.getMessage());
