@@ -2,6 +2,7 @@ package org.example.controller;
 
 import org.example.model.ContaCorrente;
 import org.example.model.Correntista;
+import org.example.security.JwtAuthenticationFilter;
 import org.example.service.ContaCorrenteService;
 import org.example.service.ContaPoupancaService;
 import org.example.service.ContaService;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ContaController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class ContaControllerTest {
 
     @Autowired
@@ -38,6 +41,9 @@ class ContaControllerTest {
 
     @MockBean
     private ContaPoupancaService contaPoupancaService;
+
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Test
     void deveCriarContaCorrenteComSaldoZero() throws Exception {
