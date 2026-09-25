@@ -14,9 +14,14 @@ export class HttpError extends Error {
 
 export async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers)
+  const token = tokenStorage.get()
 
   if (init.body && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json')
+  }
+
+  if (token && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${token}`)
   }
 
   let response: Response
@@ -40,3 +45,4 @@ export async function request<T>(path: string, init: RequestInit = {}): Promise<
 
   return body as T
 }
+import { tokenStorage } from '../storage/tokenStorage'
