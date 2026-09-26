@@ -1,4 +1,4 @@
-import { Link } from 'react-router'
+import { Link, useLocation } from 'react-router'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
@@ -57,18 +57,35 @@ function LoadingAccounts() {
 
 export function DashboardPage() {
   const accounts = useAccounts()
+  const location = useLocation()
+  const accountCreated = Boolean(
+    (location.state as { accountCreated?: boolean } | null)?.accountCreated,
+  )
 
   return (
     <div className="min-h-svh bg-muted/40">
       <AppHeader />
 
       <main className="mx-auto w-full max-w-6xl px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold tracking-tight">Visão geral</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Consulte suas contas e os saldos disponíveis.
-          </p>
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">Visão geral</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Consulte suas contas e os saldos disponíveis.
+            </p>
+          </div>
+          <Button asChild>
+            <Link to="/contas/nova">Abrir conta</Link>
+          </Button>
         </div>
+
+        {accountCreated && (
+          <Alert className="mb-6 border-emerald-200 bg-emerald-50 text-emerald-800">
+            <AlertDescription className="text-emerald-800">
+              Conta aberta com sucesso.
+            </AlertDescription>
+          </Alert>
+        )}
 
         {accounts.isPending && <LoadingAccounts />}
 
@@ -86,7 +103,7 @@ export function DashboardPage() {
             <CardHeader>
               <CardTitle className="text-base">Nenhuma conta encontrada</CardTitle>
               <CardDescription>
-                Abra uma conta pela API para visualizá-la neste painel.
+                Abra uma conta para visualizá-la neste painel.
               </CardDescription>
             </CardHeader>
           </Card>

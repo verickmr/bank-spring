@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router'
+import { AccountCreatePage } from './features/accounts/AccountCreatePage'
 import { AccountDetailsPage } from './features/accounts/AccountDetailsPage'
 import { DashboardPage } from './features/accounts/DashboardPage'
 import { LoginPage } from './features/auth/LoginPage'
@@ -17,6 +18,7 @@ function App() {
 
       <Route element={<ProtectedRoute />}>
         <Route index element={<DashboardPage />} />
+        <Route path="contas/nova" element={<AccountCreatePage />} />
         <Route path="contas/:accountId" element={<AccountDetailsPage />} />
         <Route path="correntistas" element={<CustomersPage />} />
         <Route path="correntistas/novo" element={<CustomerCreatePage />} />
