@@ -5,9 +5,14 @@ import type {
   AccountCreateType,
   AccountOperation,
   AccountOperationPayload,
+  AccountRatePayload,
   CreateAccountPayload,
   CreateAccountResponse,
 } from './accounts.types'
+
+function getAccountPathType(account: Account) {
+  return account.tipo === 'ContaCorrente' ? 'corrente' : 'poupanca'
+}
 
 export function listAccounts() {
   return request<Account[]>('/api/contas')
@@ -25,10 +30,21 @@ export function executeAccountOperation(
   operation: AccountOperation,
   payload: AccountOperationPayload,
 ) {
-  const accountType = account.tipo === 'ContaCorrente' ? 'corrente' : 'poupanca'
+  return request<Transaction>(
+    `/api/contas/${getAccountPathType(account)}/${account.id}/${operation}`,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    },
+  )
+}
 
-  return request<Transaction>(`/api/contas/${accountType}/${account.id}/${operation}`, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  })
+export function applyAccountRate(account: Account, payload: AccountRatePayload) {
+  return request<Transaction>(
+    `/api/contas/${getAccountPathType(account)}/${account.id}/taxa`,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    },
+  )
 }

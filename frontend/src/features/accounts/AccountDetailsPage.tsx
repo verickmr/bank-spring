@@ -12,6 +12,7 @@ import { TransactionList } from '../transactions/TransactionList'
 import { useTransactions } from '../transactions/useTransactions'
 import { AppHeader } from '../../shared/components/AppHeader/AppHeader'
 import { AccountOperationForm } from './AccountOperationForm'
+import { AccountRateForm } from './AccountRateForm'
 import type { Account } from './accounts.types'
 import { useAccounts } from './useAccounts'
 
@@ -81,6 +82,8 @@ export function AccountDetailsPage() {
 
               <AccountOperationForm account={account} />
             </div>
+
+            <AccountRateForm account={account} />
 
             <TransactionList
               transactions={transactions.data}

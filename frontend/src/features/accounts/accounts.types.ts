@@ -24,3 +24,7 @@ export type CreateAccountResponse = {
 export type AccountOperationPayload = {
   valor: number
 }
+
+export type AccountRatePayload = {
+  taxa: number
+}
