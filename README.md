@@ -4,7 +4,7 @@ API REST desenvolvida para o desafio técnico de estágio em desenvolvimento Bac
 
 O sistema gerencia correntistas, contas correntes, contas poupança e transações financeiras. As regras de negócio ficam encapsuladas nas entidades, enquanto os serviços coordenam persistência e registro das transações.
 
-Esta branch parte da entrega base disponível em [`main`](https://github.com/verickmr/bank-spring/tree/main) e adiciona autenticação, autorização e migrações de banco. A interface web está separada na branch [`feat/frontend-react`](https://github.com/verickmr/bank-spring/tree/feat/frontend-react).
+Esta branch parte da evolução disponível em [`feat/autenticacao-jwt`](https://github.com/verickmr/bank-spring/tree/feat/autenticacao-jwt) e adiciona a interface web **Conta Segura** para demonstrar os fluxos de ponta a ponta.
 
 ## Funcionalidades
 
@@ -26,6 +26,7 @@ Esta branch parte da entrega base disponível em [`main`](https://github.com/ver
 - Autenticação stateless com Spring Security, BCrypt e JWT
 - Autorização por proprietário para correntistas, contas e transações
 - Migrações versionadas de banco de dados com Flyway
+- Interface web responsiva para cadastro, contas, operações e extrato
 
 ## Tecnologias
 
@@ -46,6 +47,11 @@ Esta branch parte da entrega base disponível em [`main`](https://github.com/ver
 - Lombok
 - Spring Security e JWT
 - Flyway
+- React 19 e TypeScript
+- Vite e Tailwind CSS
+- shadcn/ui e Radix UI
+- TanStack Query
+- React Hook Form e Zod
 
 ## Pré-requisitos
 
@@ -59,6 +65,11 @@ Para executar com MySQL:
 - Docker com Docker Compose
 - JDK 8
 - Maven 3.6 ou superior
+
+Para executar a interface web:
+
+- Node.js 22 ou superior
+- npm
 
 ## Como executar
 
@@ -141,6 +152,20 @@ Para encerrar o container:
 docker compose down
 ```
 
+### Executar o frontend
+
+Com a API disponível em `http://localhost:8080`, abra outro terminal:
+
+```bash
+cd frontend
+npm ci
+npm run dev
+```
+
+A interface estará disponível em `http://localhost:5173`. Durante o desenvolvimento, o Vite encaminha as requisições de `/api` para a API na porta `8080`.
+
+No primeiro acesso com o banco vazio, selecione **Criar cadastro** na tela de login. Depois entre com o CPF e a senha cadastrados.
+
 ## Documentação da API
 
 Com a aplicação em execução, acesse:
@@ -159,6 +184,15 @@ mvn test
 ```
 
 A suíte cobre regras de depósito, saque, juros, rendimento, validações, respostas dos controllers, autenticação e isolamento dos recursos por correntista.
+
+Para verificar o frontend:
+
+```bash
+cd frontend
+npm run typecheck
+npm run lint
+npm run build
+```
 
 ## Endpoints
 
@@ -350,6 +384,7 @@ Os erros seguem uma estrutura padronizada:
 
 ```mermaid
 flowchart LR
+    Navegador[React] -->|HTTP + JWT| Controller
     Swagger[Swagger / Postman] -->|HTTP + JWT| Controller
     Controller --> Service
     Service --> Autorizacao[Verificação de proprietário]
@@ -367,6 +402,7 @@ O projeto está organizado nas seguintes responsabilidades:
 - **Repository:** fornece acesso ao banco de dados com Spring Data JPA.
 - **DTO:** define os contratos de entrada e saída da API.
 - **Exception:** centraliza erros de negócio e respostas HTTP padronizadas.
+- **Frontend:** organiza a interface por funcionalidades, centraliza chamadas HTTP e usa cache de servidor com TanStack Query.
 
 ### Decisões técnicas
 
@@ -381,6 +417,7 @@ O projeto está organizado nas seguintes responsabilidades:
 - A autenticação é stateless: a senha é armazenada com BCrypt e o cliente envia um JWT em cada requisição protegida.
 - A autorização ocorre na camada de serviço: listagens são filtradas pelo CPF autenticado e acessos por ID validam o proprietário.
 - O MySQL usa migrações Flyway versionadas, o que permite evoluir o schema sem apagar os dados existentes.
+- O frontend separa API, tipos, validação, hooks e componentes dentro de cada funcionalidade.
 
 ## Escopo da entrega
 
@@ -388,7 +425,7 @@ Todos os requisitos obrigatórios foram implementados, incluindo gerenciamento d
 
 Também foram implementados os diferenciais sugeridos: rendimento da poupança, juros da conta corrente, testes automatizados, Swagger/OpenAPI e tratamento padronizado de erros.
 
-Como evolução adicional, esta branch inclui autenticação JWT, senhas protegidas com BCrypt, isolamento dos recursos por proprietário e migrações Flyway. O frontend foi mantido em uma branch própria para não misturar a avaliação do backend com a interface.
+Como evolução adicional, esta branch inclui autenticação JWT, isolamento dos recursos por proprietário, migrações Flyway e uma interface React para login, cadastro, contas, operações financeiras e extrato.
 
 Nenhum requisito obrigatório ou diferencial listado no desafio ficou pendente.
 
