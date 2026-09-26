@@ -20,8 +20,21 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   )
 }
 
-export function CustomerForm() {
-  const createCustomer = useCreateCustomer()
+type CustomerFormProps = {
+  redirectTo: string
+  redirectState?: Record<string, boolean>
+  submitLabel?: string
+}
+
+export function CustomerForm({
+  redirectTo,
+  redirectState,
+  submitLabel = 'Cadastrar correntista',
+}: CustomerFormProps) {
+  const createCustomer = useCreateCustomer({
+    redirectTo,
+    state: redirectState,
+  })
   const {
     register,
     handleSubmit,
@@ -102,7 +115,7 @@ export function CustomerForm() {
       )}
 
       <Button type="submit" className="w-full" disabled={createCustomer.isPending}>
-        {createCustomer.isPending ? 'Cadastrando…' : 'Cadastrar correntista'}
+        {createCustomer.isPending ? 'Cadastrando…' : submitLabel}
       </Button>
     </form>
   )

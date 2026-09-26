@@ -3,17 +3,24 @@ import { AccountCreatePage } from './features/accounts/AccountCreatePage'
 import { AccountDetailsPage } from './features/accounts/AccountDetailsPage'
 import { DashboardPage } from './features/accounts/DashboardPage'
 import { LoginPage } from './features/auth/LoginPage'
+import { SignupPage } from './features/auth/SignupPage'
 import { CustomerCreatePage } from './features/customers/CustomerCreatePage'
 import { CustomersPage } from './features/customers/CustomersPage'
 import { ProtectedRoute } from './shared/routing/ProtectedRoute'
 import { tokenStorage } from './shared/storage/tokenStorage'
 
 function App() {
+  const isAuthenticated = Boolean(tokenStorage.get())
+
   return (
     <Routes>
       <Route
         path="/login"
-        element={tokenStorage.get() ? <Navigate to="/" replace /> : <LoginPage />}
+        element={isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />}
+      />
+      <Route
+        path="/cadastro"
+        element={isAuthenticated ? <Navigate to="/" replace /> : <SignupPage />}
       />
 
       <Route element={<ProtectedRoute />}>

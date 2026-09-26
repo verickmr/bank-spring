@@ -1,3 +1,6 @@
+import { Link, useLocation } from 'react-router'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -10,6 +13,11 @@ import { Brand } from '../../shared/components/Brand/Brand'
 import { LoginForm } from './LoginForm'
 
 export function LoginPage() {
+  const location = useLocation()
+  const registrationComplete = Boolean(
+    (location.state as { registrationComplete?: boolean } | null)?.registrationComplete,
+  )
+
   return (
     <div className="grid min-h-svh grid-rows-[auto_1fr_auto] bg-muted/40">
       <header className="border-b bg-background">
@@ -30,14 +38,24 @@ export function LoginPage() {
             <CardDescription>Informe seus dados para continuar.</CardDescription>
           </CardHeader>
 
-          <CardContent>
+          <CardContent className="space-y-5">
+            {registrationComplete && (
+              <Alert className="border-emerald-200 bg-emerald-50 text-emerald-800">
+                <AlertDescription className="text-emerald-800">
+                  Cadastro concluído. Entre com seu CPF e sua senha.
+                </AlertDescription>
+              </Alert>
+            )}
             <LoginForm />
           </CardContent>
 
-          <CardFooter className="border-t pt-5">
-            <p className="w-full text-center text-xs leading-5 text-muted-foreground">
-            Seus dados são utilizados somente para autenticar o acesso.
+          <CardFooter className="flex-col gap-3 border-t pt-5">
+            <p className="text-center text-xs leading-5 text-muted-foreground">
+              Ainda não possui acesso?
             </p>
+            <Button asChild variant="outline" className="w-full">
+              <Link to="/cadastro">Criar cadastro</Link>
+            </Button>
           </CardFooter>
         </Card>
       </main>

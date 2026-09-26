@@ -28,7 +28,7 @@ export function CustomerCreatePage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <CustomerForm />
+            <CustomerForm redirectTo="/correntistas" redirectState={{ customerCreated: true }} />
           </CardContent>
         </Card>
       </main>

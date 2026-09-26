@@ -5,7 +5,12 @@ import { createCustomer } from './customers.api'
 import type { CustomerCreateFormData } from './customers.schema'
 import type { Customer } from './customers.types'
 
-export function useCreateCustomer() {
+type CreateCustomerNavigation = {
+  redirectTo: string
+  state?: Record<string, boolean>
+}
+
+export function useCreateCustomer({ redirectTo, state }: CreateCustomerNavigation) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
@@ -13,10 +18,7 @@ export function useCreateCustomer() {
     mutationFn: createCustomer,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['customers'] })
-      navigate('/correntistas', {
-        replace: true,
-        state: { customerCreated: true },
-      })
+      navigate(redirectTo, { replace: true, state })
     },
   })
 }
