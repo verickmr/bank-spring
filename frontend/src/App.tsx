@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router'
+import { AccountDetailsPage } from './features/accounts/AccountDetailsPage'
 import { DashboardPage } from './features/accounts/DashboardPage'
 import { LoginPage } from './features/auth/LoginPage'
 import { ProtectedRoute } from './shared/routing/ProtectedRoute'
@@ -14,6 +15,7 @@ function App() {
 
       <Route element={<ProtectedRoute />}>
         <Route index element={<DashboardPage />} />
+        <Route path="contas/:accountId" element={<AccountDetailsPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

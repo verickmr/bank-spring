@@ -1,3 +1,5 @@
+import { tokenStorage } from '../storage/tokenStorage'
+
 type ErrorResponse = {
   message?: string
 }
@@ -45,4 +47,3 @@ export async function request<T>(path: string, init: RequestInit = {}): Promise<
 
   return body as T
 }
-import { tokenStorage } from '../storage/tokenStorage'

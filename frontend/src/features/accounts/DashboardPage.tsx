@@ -1,16 +1,15 @@
-import { useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from 'react-router'
+import { Link } from 'react-router'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Brand } from '../../shared/components/Brand/Brand'
-import { tokenStorage } from '../../shared/storage/tokenStorage'
+import { AppHeader } from '../../shared/components/AppHeader/AppHeader'
 import type { Account } from './accounts.types'
 import { useAccounts } from './useAccounts'
 
@@ -37,6 +36,11 @@ function AccountCard({ account }: { account: Account }) {
           {currencyFormatter.format(account.saldo)}
         </p>
       </CardContent>
+      <CardFooter>
+        <Button asChild variant="outline" className="w-full">
+          <Link to={`/contas/${account.id}`}>Ver extrato</Link>
+        </Button>
+      </CardFooter>
     </Card>
   )
 }
@@ -52,26 +56,11 @@ function LoadingAccounts() {
 }
 
 export function DashboardPage() {
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
   const accounts = useAccounts()
-
-  const logout = () => {
-    tokenStorage.remove()
-    queryClient.clear()
-    navigate('/login', { replace: true })
-  }
 
   return (
     <div className="min-h-svh bg-muted/40">
-      <header className="border-b bg-background">
-        <div className="mx-auto flex min-h-16 w-full max-w-6xl items-center justify-between px-4">
-          <Brand />
-          <Button variant="outline" onClick={logout}>
-            Sair
-          </Button>
-        </div>
-      </header>
+      <AppHeader />
 
       <main className="mx-auto w-full max-w-6xl px-4 py-8">
         <div className="mb-6">
@@ -87,11 +76,7 @@ export function DashboardPage() {
           <Alert variant="destructive">
             <AlertDescription className="flex flex-wrap items-center justify-between gap-3">
               <span>{accounts.error.message}</span>
-              {accounts.error.status === 401 && (
-                <Button variant="outline" size="sm" onClick={logout}>
-                  Entrar novamente
-                </Button>
-              )}
+              {accounts.error.status === 401 && <span>Entre novamente para continuar.</span>}
             </AlertDescription>
           </Alert>
         )}
