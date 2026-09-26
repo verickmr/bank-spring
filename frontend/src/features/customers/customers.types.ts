@@ -7,3 +7,10 @@ export type Customer = {
   email: string
   contas: Account[]
 }
+
+export type CreateCustomerPayload = {
+  cpf: string
+  nome: string
+  email: string
+  senha: string
+}

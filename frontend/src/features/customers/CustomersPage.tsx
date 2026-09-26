@@ -1,4 +1,6 @@
+import { Link, useLocation } from 'react-router'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -43,18 +45,35 @@ function LoadingCustomers() {
 
 export function CustomersPage() {
   const customers = useCustomers()
+  const location = useLocation()
+  const customerCreated = Boolean(
+    (location.state as { customerCreated?: boolean } | null)?.customerCreated,
+  )
 
   return (
     <div className="min-h-svh bg-muted/40">
       <AppHeader />
 
       <main className="mx-auto w-full max-w-6xl px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold tracking-tight">Correntistas</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Consulte os clientes cadastrados e a quantidade de contas vinculadas.
-          </p>
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">Correntistas</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Consulte os clientes cadastrados e a quantidade de contas vinculadas.
+            </p>
+          </div>
+          <Button asChild>
+            <Link to="/correntistas/novo">Novo correntista</Link>
+          </Button>
         </div>
+
+        {customerCreated && (
+          <Alert className="mb-6 border-emerald-200 bg-emerald-50 text-emerald-800">
+            <AlertDescription className="text-emerald-800">
+              Correntista cadastrado com sucesso.
+            </AlertDescription>
+          </Alert>
+        )}
 
         {customers.isPending && <LoadingCustomers />}
 
