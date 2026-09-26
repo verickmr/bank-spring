@@ -1,7 +1,10 @@
 import { request } from '../../shared/api/httpClient'
+import type { Transaction } from '../transactions/transactions.types'
 import type {
   Account,
   AccountCreateType,
+  AccountOperation,
+  AccountOperationPayload,
   CreateAccountPayload,
   CreateAccountResponse,
 } from './accounts.types'
@@ -12,6 +15,19 @@ export function listAccounts() {
 
 export function createAccount(type: AccountCreateType, payload: CreateAccountPayload) {
   return request<CreateAccountResponse>(`/api/contas/${type}`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function executeAccountOperation(
+  account: Account,
+  operation: AccountOperation,
+  payload: AccountOperationPayload,
+) {
+  const accountType = account.tipo === 'ContaCorrente' ? 'corrente' : 'poupanca'
+
+  return request<Transaction>(`/api/contas/${accountType}/${account.id}/${operation}`, {
     method: 'POST',
     body: JSON.stringify(payload),
   })

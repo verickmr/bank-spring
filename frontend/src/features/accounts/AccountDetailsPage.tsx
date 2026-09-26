@@ -11,6 +11,7 @@ import {
 import { TransactionList } from '../transactions/TransactionList'
 import { useTransactions } from '../transactions/useTransactions'
 import { AppHeader } from '../../shared/components/AppHeader/AppHeader'
+import { AccountOperationForm } from './AccountOperationForm'
 import type { Account } from './accounts.types'
 import { useAccounts } from './useAccounts'
 
@@ -64,18 +65,22 @@ export function AccountDetailsPage() {
 
         {account && (
           <>
-            <Card className="mb-6">
-              <CardHeader>
-                <CardDescription>{accountTypeLabels[account.tipo]}</CardDescription>
-                <CardTitle>Conta {account.numero}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">Saldo disponível</p>
-                <p className="mt-1 text-3xl font-semibold tracking-tight">
-                  {currencyFormatter.format(account.saldo)}
-                </p>
-              </CardContent>
-            </Card>
+            <div className="mb-6 grid gap-6 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardDescription>{accountTypeLabels[account.tipo]}</CardDescription>
+                  <CardTitle>Conta {account.numero}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Saldo disponível</p>
+                  <p className="mt-1 text-3xl font-semibold tracking-tight">
+                    {currencyFormatter.format(account.saldo)}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <AccountOperationForm account={account} />
+            </div>
 
             <TransactionList
               transactions={transactions.data}
