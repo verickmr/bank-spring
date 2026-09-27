@@ -54,6 +54,12 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Versionamento e migração do schema MySQL -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+
 
         <!-- Bean Validation -->
         <dependency>

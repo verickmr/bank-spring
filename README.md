@@ -4,6 +4,8 @@ API REST desenvolvida para o desafio técnico de estágio em desenvolvimento Bac
 
 O sistema gerencia correntistas, contas correntes, contas poupança e transações financeiras. As regras de negócio ficam encapsuladas nas entidades, enquanto os serviços coordenam persistência e registro das transações.
 
+Esta branch parte da entrega base disponível em [`main`](https://github.com/verickmr/bank-spring/tree/main) e adiciona autenticação, autorização e migrações de banco. A interface web está separada na branch [`feat/frontend-react`](https://github.com/verickmr/bank-spring/tree/feat/frontend-react).
+
 ## Funcionalidades
 
 - Cadastro e consulta de correntistas
@@ -21,15 +23,9 @@ O sistema gerencia correntistas, contas correntes, contas poupança e transaçõ
 - Perfis para H2 e MySQL
 - MySQL configurado com Docker Compose
 - Testes unitários e de controllers
-
-## Evoluções opcionais
-
-A branch `main` contém a entrega base do desafio, com o escopo obrigatório e os diferenciais solicitados. Duas evoluções foram mantidas separadas para que a solução base continue simples de avaliar:
-
-- [`feat/autenticacao-jwt`](https://github.com/verickmr/bank-spring/tree/feat/autenticacao-jwt): adiciona Spring Security, senhas com BCrypt, login JWT, autorização por proprietário e migrações Flyway.
-- [`feat/frontend-react`](https://github.com/verickmr/bank-spring/tree/feat/frontend-react): parte da versão autenticada e adiciona a interface Conta Segura em React e TypeScript.
-
-Essa separação permite executar e revisar somente a API pedida no desafio ou consultar as melhorias adicionais de forma independente.
+- Autenticação stateless com Spring Security, BCrypt e JWT
+- Autorização por proprietário para correntistas, contas e transações
+- Migrações versionadas de banco de dados com Flyway
 
 ## Tecnologias
 
@@ -48,6 +44,8 @@ Essa separação permite executar e revisar somente a API pedida no desafio ou c
 - Mockito
 - Maven
 - Lombok
+- Spring Security e JWT
+- Flyway
 
 ## Pré-requisitos
 
@@ -122,10 +120,20 @@ docker compose ps
 Execute a aplicação com o perfil MySQL:
 
 ```bash
+export JWT_SECRET='troque-por-um-segredo-com-pelo-menos-32-bytes'
 mvn -Dspring-boot.run.profiles=mysql spring-boot:run
 ```
 
-O schema é criado pelo script [`db/schema.sql`](db/schema.sql) quando o volume do MySQL é inicializado pela primeira vez.
+No PowerShell, defina a variável com:
+
+```powershell
+$env:JWT_SECRET='troque-por-um-segredo-com-pelo-menos-32-bytes'
+mvn -Dspring-boot.run.profiles=mysql spring-boot:run
+```
+
+O segredo JWT é obrigatório no perfil MySQL e deve possuir pelo menos 32 bytes. O arquivo `.env` configura o container do MySQL; a variável `JWT_SECRET` deve estar disponível no terminal que inicia a aplicação.
+
+O Flyway cria e atualiza o schema pelas migrações em [`src/main/resources/db/migration`](src/main/resources/db/migration). A migração V2 preserva os dados de instalações anteriores e adiciona a coluna de senha. Como senhas inexistentes não podem ser recuperadas, correntistas legados recebem um hash aleatório inacessível e precisam definir uma nova senha por um fluxo administrativo seguro antes de entrar.
 
 Para encerrar o container:
 
@@ -140,7 +148,7 @@ Com a aplicação em execução, acesse:
 - Swagger UI: <http://localhost:8080/swagger-ui/index.html>
 - OpenAPI JSON: <http://localhost:8080/v3/api-docs>
 
-A interface do Swagger permite consultar os contratos e executar requisições diretamente no navegador.
+A interface do Swagger permite consultar os contratos e executar requisições diretamente no navegador. Para testar endpoints protegidos, execute o login, copie o token retornado e use o botão **Authorize**. O Swagger adicionará o prefixo `Bearer` automaticamente.
 
 ## Testes
 
@@ -150,7 +158,7 @@ Execute a suíte automatizada com:
 mvn test
 ```
 
-A suíte cobre regras de depósito, saque, juros, rendimento, validações e respostas dos controllers.
+A suíte cobre regras de depósito, saque, juros, rendimento, validações, respostas dos controllers, autenticação e isolamento dos recursos por correntista.
 
 ## Endpoints
 
@@ -160,12 +168,44 @@ As requisições com corpo devem utilizar o cabeçalho:
 Content-Type: application/json
 ```
 
+Com exceção do login e do cadastro de correntista, os endpoints exigem:
+
+```text
+Authorization: Bearer <token>
+```
+
+### Autenticação
+
+| Método | Endpoint | Descrição | Sucesso |
+|---|---|---|---|
+| `POST` | `/api/auth/login` | Autentica com CPF e senha | `200 OK` |
+
+```http
+POST /api/auth/login
+```
+
+```json
+{
+  "cpf": "12345678900",
+  "senha": "senhaSegura123"
+}
+```
+
+A resposta contém o token JWT usado nas demais requisições:
+
+```json
+{
+  "token": "eyJ...",
+  "tipo": "Bearer"
+}
+```
+
 ### Correntistas
 
 | Método | Endpoint | Descrição | Sucesso |
 |---|---|---|---|
-| `GET` | `/api/correntistas` | Lista todos os correntistas | `200 OK` |
-| `GET` | `/api/correntistas/{id}` | Busca um correntista pelo ID | `200 OK` |
+| `GET` | `/api/correntistas` | Lista o correntista autenticado | `200 OK` |
+| `GET` | `/api/correntistas/{id}` | Busca o próprio cadastro pelo ID | `200 OK` |
 | `POST` | `/api/correntistas` | Cadastra um correntista | `201 Created` |
 
 #### Cadastrar um correntista
@@ -189,8 +229,8 @@ O CPF deve conter 11 dígitos e não pode pertencer a outro correntista.
 
 | Método | Endpoint | Descrição | Sucesso |
 |---|---|---|---|
-| `GET` | `/api/contas` | Lista todas as contas | `200 OK` |
-| `GET` | `/api/contas/{id}` | Busca uma conta pelo ID | `200 OK` |
+| `GET` | `/api/contas` | Lista as contas do correntista autenticado | `200 OK` |
+| `GET` | `/api/contas/{id}` | Busca uma conta própria pelo ID | `200 OK` |
 | `POST` | `/api/contas/{tipo}` | Abre uma conta | `201 Created` |
 | `POST` | `/api/contas/{tipo}/{id}/depositar` | Realiza um depósito | `200 OK` |
 | `POST` | `/api/contas/{tipo}/{id}/sacar` | Realiza um saque | `200 OK` |
@@ -226,6 +266,7 @@ POST /api/contas/poupanca
 ```
 
 Toda conta é aberta com saldo igual a zero. O saldo inicial não pode ser informado pelo cliente.
+O `correntistaId` deve ser o identificador do usuário autenticado; tentativas de abrir ou operar uma conta de outro correntista retornam `403 Forbidden`.
 
 #### Realizar um depósito
 
@@ -273,8 +314,8 @@ Para conta corrente, os juros são aplicados somente quando o saldo está negati
 
 | Método | Endpoint | Descrição | Sucesso |
 |---|---|---|---|
-| `GET` | `/api/transacoes` | Lista todas as transações | `200 OK` |
-| `GET` | `/api/transacoes/conta/{contaId}` | Consulta o extrato de uma conta | `200 OK` |
+| `GET` | `/api/transacoes` | Lista as transações do correntista autenticado | `200 OK` |
+| `GET` | `/api/transacoes/conta/{contaId}` | Consulta o extrato de uma conta própria | `200 OK` |
 
 #### Consultar o extrato
 
@@ -299,6 +340,8 @@ Os erros seguem uma estrutura padronizada:
 | Status | Situação |
 |---|---|
 | `400 Bad Request` | Corpo inválido, campos inválidos ou tipo de conta desconhecido |
+| `401 Unauthorized` | Token ausente, inválido ou expirado |
+| `403 Forbidden` | Usuário autenticado tentou acessar um recurso de outro correntista |
 | `404 Not Found` | Correntista ou conta não encontrado |
 | `409 Conflict` | CPF já cadastrado |
 | `422 Unprocessable Entity` | Violação de uma regra de negócio |
@@ -307,8 +350,9 @@ Os erros seguem uma estrutura padronizada:
 
 ```mermaid
 flowchart LR
-    Cliente --> Controller
+    Swagger[Swagger / Postman] -->|HTTP + JWT| Controller
     Controller --> Service
+    Service --> Autorizacao[Verificação de proprietário]
     Service --> Dominio[Entidades de domínio]
     Service --> Repository
     Repository --> Banco[(H2 ou MySQL)]
@@ -318,6 +362,7 @@ O projeto está organizado nas seguintes responsabilidades:
 
 - **Controller:** recebe requisições, valida os dados de entrada e define as respostas HTTP.
 - **Service:** coordena casos de uso, persistência e registro das transações.
+- **Security:** autentica o JWT e impede acesso a recursos pertencentes a outro correntista.
 - **Model:** representa o domínio e encapsula regras de depósito, saque, juros e rendimento.
 - **Repository:** fornece acesso ao banco de dados com Spring Data JPA.
 - **DTO:** define os contratos de entrada e saída da API.
@@ -333,6 +378,9 @@ O projeto está organizado nas seguintes responsabilidades:
 - O perfil H2 facilita a execução local e os testes.
 - O perfil MySQL aproxima a aplicação de um ambiente real.
 - O saldo inicial é sempre zero e só pode mudar por meio de uma operação financeira registrada.
+- A autenticação é stateless: a senha é armazenada com BCrypt e o cliente envia um JWT em cada requisição protegida.
+- A autorização ocorre na camada de serviço: listagens são filtradas pelo CPF autenticado e acessos por ID validam o proprietário.
+- O MySQL usa migrações Flyway versionadas, o que permite evoluir o schema sem apagar os dados existentes.
 
 ## Escopo da entrega
 
@@ -340,21 +388,9 @@ Todos os requisitos obrigatórios foram implementados, incluindo gerenciamento d
 
 Também foram implementados os diferenciais sugeridos: rendimento da poupança, juros da conta corrente, testes automatizados, Swagger/OpenAPI e tratamento padronizado de erros.
 
+Como evolução adicional, esta branch inclui autenticação JWT, senhas protegidas com BCrypt, isolamento dos recursos por proprietário e migrações Flyway. O frontend foi mantido em uma branch própria para não misturar a avaliação do backend com a interface.
+
 Nenhum requisito obrigatório ou diferencial listado no desafio ficou pendente.
-
-### Processo de desenvolvimento
-
-O projeto foi evoluído em etapas pequenas e verificáveis:
-
-1. padronização dos erros da API;
-2. testes das regras de saque, depósito, juros e rendimento;
-3. encapsulamento das regras financeiras nas entidades;
-4. validação dos corpos das requisições e dos tipos de conta;
-5. configuração dos perfis H2 e MySQL com Docker;
-6. documentação da API com Swagger e exemplos no README;
-7. substituição de `double` por `BigDecimal` para valores monetários.
-
-Cada etapa foi registrada em commits separados e validada antes da próxima alteração.
 
 ## Autor
 

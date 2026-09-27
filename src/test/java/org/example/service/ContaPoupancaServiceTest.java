@@ -10,6 +10,7 @@ import org.example.model.Transacao;
 import org.example.repository.ContaRepository;
 import org.example.repository.CorrentistaRepository;
 import org.example.repository.TransacaoRepository;
+import org.example.security.OwnershipGuard;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -39,6 +40,9 @@ class ContaPoupancaServiceTest {
 
     @Mock
     private TransacaoRepository transacaoRepository;
+
+    @Mock
+    private OwnershipGuard ownershipGuard;
 
     @InjectMocks
     private ContaPoupancaService service;

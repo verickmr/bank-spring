@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.dto.TransacaoResponse;
 import org.example.model.Transacao;
 import org.example.repository.TransacaoRepository;
+import org.example.security.OwnershipGuard;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,15 +15,21 @@ import java.util.stream.Collectors;
 public class TransacaoService {
 
     private final TransacaoRepository transacaoRepository;
+    private final ContaService contaService;
+    private final OwnershipGuard ownershipGuard;
 
     public List<TransacaoResponse> listarTodas() {
-        return transacaoRepository.findAll().stream()
+        return transacaoRepository
+                .findAllByContaCorrentistaCpf(ownershipGuard.cpfAtual())
+                .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
 
     public List<TransacaoResponse> listarPorConta(Long contaId) {
-        return transacaoRepository.findByContaId(contaId).stream()
+        contaService.buscarPorId(contaId);
+        return transacaoRepository.findByContaId(contaId)
+                .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }

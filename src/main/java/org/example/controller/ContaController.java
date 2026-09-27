@@ -32,13 +32,13 @@ public class ContaController {
     private final ContaCorrenteService contaCorrenteService;
     private final ContaPoupancaService contaPoupancaService;
 
-    @Operation(summary = "Lista todas as contas")
+    @Operation(summary = "Lista as contas do correntista autenticado")
     @GetMapping
     public ResponseEntity<?> listarContas() {
         return ResponseEntity.ok(contaService.listarContas());
     }
 
-    @Operation(summary = "Busca uma conta pelo ID")
+    @Operation(summary = "Busca uma conta do correntista autenticado pelo ID")
     @GetMapping("/{id}")
     public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(contaService.buscarPorId(id));

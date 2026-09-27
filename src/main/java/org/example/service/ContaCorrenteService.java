@@ -11,6 +11,7 @@ import org.example.model.Transacao;
 import org.example.repository.ContaRepository;
 import org.example.repository.CorrentistaRepository;
 import org.example.repository.TransacaoRepository;
+import org.example.security.OwnershipGuard;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,10 +25,13 @@ public class ContaCorrenteService {
     private final ContaRepository contaRepository;
     private final CorrentistaRepository correntistaRepository;
     private final TransacaoRepository transacaoRepository;
+    private final OwnershipGuard ownershipGuard;
 
     public Correntista buscarCorrentista(Long id) {
-        return correntistaRepository.findById(id)
+        Correntista correntista = correntistaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Correntista não encontrado."));
+        ownershipGuard.verificarCorrentista(correntista);
+        return correntista;
     }
 
     private ContaCorrente buscarContaCorrente(Long id) {
@@ -35,6 +39,8 @@ public class ContaCorrenteService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Conta corrente não encontrada.")
                 );
+
+        ownershipGuard.verificarConta(conta);
 
         if (!(conta instanceof ContaCorrente)) {
             throw new BusinessRuleException(
@@ -46,6 +52,7 @@ public class ContaCorrenteService {
     }
 
     public ContaCorrente salvar(ContaCorrente conta) {
+        ownershipGuard.verificarConta(conta);
         return contaRepository.save(conta);
     }
 

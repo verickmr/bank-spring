@@ -8,6 +8,7 @@ import org.example.exception.ConflictException;
 import org.example.exception.ResourceNotFoundException;
 import org.example.model.Correntista;
 import org.example.repository.CorrentistaRepository;
+import org.example.security.OwnershipGuard;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,19 +24,18 @@ public class CorrentistaService {
 
     private final CorrentistaRepository correntistaRepository;
     private final PasswordEncoder passwordEncoder;
+    private final OwnershipGuard ownershipGuard;
 
     @Transactional(readOnly = true)
     public List<CorrentistaResponse> listarTodos() {
-        return correntistaRepository.findAll()
-                .stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+        return Collections.singletonList(toResponse(ownershipGuard.correntistaAtual()));
     }
 
     @Transactional(readOnly = true)
     public CorrentistaResponse buscarPorId(Long id) {
         Correntista correntista = correntistaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Correntista não encontrado."));
+        ownershipGuard.verificarCorrentista(correntista);
         return toResponse(correntista);
     }
 

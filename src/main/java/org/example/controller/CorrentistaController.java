@@ -30,13 +30,13 @@ public class CorrentistaController {
 
     private final CorrentistaService service;
 
-    @Operation(summary = "Lista todos os correntistas")
+    @Operation(summary = "Lista o correntista autenticado")
     @GetMapping
     public ResponseEntity<List<CorrentistaResponse>> listarTodos() {
         return ResponseEntity.ok(service.listarTodos());
     }
 
-    @Operation(summary = "Busca um correntista pelo ID")
+    @Operation(summary = "Busca o próprio cadastro pelo ID")
     @GetMapping("/{id}")
     public ResponseEntity<CorrentistaResponse> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(service.buscarPorId(id));

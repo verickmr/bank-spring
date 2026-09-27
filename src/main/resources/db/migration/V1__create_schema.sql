@@ -1,14 +1,13 @@
-CREATE TABLE IF NOT EXISTS correntista (
+CREATE TABLE correntista (
     id BIGINT NOT NULL AUTO_INCREMENT,
     cpf VARCHAR(14) NOT NULL,
     nome VARCHAR(255),
     email VARCHAR(255),
-    senha VARCHAR(60) NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT uk_correntista_cpf UNIQUE (cpf)
 ) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS conta (
+CREATE TABLE conta (
     id BIGINT NOT NULL AUTO_INCREMENT,
     numero VARCHAR(255),
     saldo DECIMAL(19,2) NOT NULL,
@@ -18,7 +17,7 @@ CREATE TABLE IF NOT EXISTS conta (
         FOREIGN KEY (correntista_id) REFERENCES correntista (id)
 ) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS conta_corrente (
+CREATE TABLE conta_corrente (
     id BIGINT NOT NULL,
     limite DECIMAL(19,2) NOT NULL,
     PRIMARY KEY (id),
@@ -26,14 +25,14 @@ CREATE TABLE IF NOT EXISTS conta_corrente (
         FOREIGN KEY (id) REFERENCES conta (id)
 ) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS conta_poupanca (
+CREATE TABLE conta_poupanca (
     id BIGINT NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT fk_conta_poupanca_conta
         FOREIGN KEY (id) REFERENCES conta (id)
 ) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS transacao (
+CREATE TABLE transacao (
     id BIGINT NOT NULL AUTO_INCREMENT,
     conta_id BIGINT,
     tipo VARCHAR(30),

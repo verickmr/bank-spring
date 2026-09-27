@@ -4,6 +4,7 @@ import org.example.dto.CorrentistaRequest;
 import org.example.exception.ConflictException;
 import org.example.model.Correntista;
 import org.example.repository.CorrentistaRepository;
+import org.example.security.OwnershipGuard;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -28,6 +29,9 @@ class CorrentistaServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private OwnershipGuard ownershipGuard;
 
     @InjectMocks
     private CorrentistaService service;

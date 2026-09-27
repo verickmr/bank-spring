@@ -21,13 +21,13 @@ public class TransacaoController {
 
     private final TransacaoService transacaoService;
 
-    @Operation(summary = "Lista todas as transações")
+    @Operation(summary = "Lista as transações do correntista autenticado")
     @GetMapping
     public ResponseEntity<List<TransacaoResponse>> listarTodas() {
         return ResponseEntity.ok(transacaoService.listarTodas());
     }
 
-    @Operation(summary = "Consulta o extrato de uma conta")
+    @Operation(summary = "Consulta o extrato de uma conta própria")
     @GetMapping("/conta/{contaId}")
     public ResponseEntity<List<TransacaoResponse>> listarPorConta(@PathVariable Long contaId) {
         return ResponseEntity.ok(transacaoService.listarPorConta(contaId));

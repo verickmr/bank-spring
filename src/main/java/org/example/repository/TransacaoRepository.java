@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
     List<Transacao> findByContaId(Long contaId);
+
+    List<Transacao> findAllByContaCorrentistaCpf(String cpf);
 }

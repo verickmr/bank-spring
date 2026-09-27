@@ -50,6 +50,19 @@ class JwtServiceTest {
         );
     }
 
+    @Test
+    void deveRejeitarSecretComMenosDeTrintaEDoisBytes() {
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> new JwtService("segredo-curto", 60)
+        );
+
+        assertEquals(
+                "JWT_SECRET deve possuir pelo menos 32 bytes.",
+                exception.getMessage()
+        );
+    }
+
     private Correntista criarCorrentista() {
         return Correntista.builder()
                 .id(1L)
