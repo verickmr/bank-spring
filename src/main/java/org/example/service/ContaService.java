@@ -16,7 +16,6 @@ public class ContaService {
 
     private final ContaRepository contaRepository;
 
-    // -------- CRUD GENÉRICO --------
     public List<ContaResponse> listarContas() {
         return contaRepository.findAll().stream()
                 .map(this::toResponse)
@@ -28,24 +27,13 @@ public class ContaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Conta não encontrada."));
     }
 
-    public ContaResponse buscarDtoPorId(Long id) {
-        return toResponse(buscarPorId(id));
-    }
 
-    public Conta salvar(Conta conta) {
-        return contaRepository.save(conta);
-    }
-
-    public void deletar(Long id) {
-        Conta conta = buscarPorId(id);
-        contaRepository.delete(conta);
-    }
     private ContaResponse toResponse(Conta conta) {
         return ContaResponse.builder()
                 .id(conta.getId())
                 .numero(conta.getNumero())
                 .saldo(conta.getSaldo())
-                .tipo(conta.getClass().getSimpleName()) // “ContaCorrente” ou “ContaPoupanca”
+                .tipo(conta.getClass().getSimpleName())
                 .build();
     }
 }

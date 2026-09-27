@@ -1,9 +1,9 @@
 package org.example.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.example.exception.BusinessRuleException;
 
 import javax.persistence.Column;
@@ -12,10 +12,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 public class ContaCorrente extends Conta {
 
     @Column(nullable = false, precision = 19, scale = 2)

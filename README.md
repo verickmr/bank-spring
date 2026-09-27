@@ -6,7 +6,7 @@ O sistema gerencia correntistas, contas correntes, contas poupança e transaçõ
 
 ## Funcionalidades
 
-- Cadastro, consulta, atualização e exclusão de correntistas
+- Cadastro e consulta de correntistas
 - Abertura e consulta de contas
 - Depósitos e saques
 - Extrato de transações por conta
@@ -21,6 +21,15 @@ O sistema gerencia correntistas, contas correntes, contas poupança e transaçõ
 - Perfis para H2 e MySQL
 - MySQL configurado com Docker Compose
 - Testes unitários e de controllers
+
+## Evoluções opcionais
+
+A branch `main` contém a entrega base do desafio, com o escopo obrigatório e os diferenciais solicitados. Duas evoluções foram mantidas separadas para que a solução base continue simples de avaliar:
+
+- [`feat/autenticacao-jwt`](https://github.com/verickmr/bank-spring/tree/feat/autenticacao-jwt): adiciona Spring Security, senhas com BCrypt, login JWT, autorização por proprietário e migrações Flyway.
+- [`feat/frontend-react`](https://github.com/verickmr/bank-spring/tree/feat/frontend-react): parte da versão autenticada e adiciona a interface Conta Segura em React e TypeScript.
+
+Essa separação permite executar e revisar somente a API pedida no desafio ou consultar as melhorias adicionais de forma independente.
 
 ## Tecnologias
 
@@ -158,8 +167,6 @@ Content-Type: application/json
 | `GET` | `/api/correntistas` | Lista todos os correntistas | `200 OK` |
 | `GET` | `/api/correntistas/{id}` | Busca um correntista pelo ID | `200 OK` |
 | `POST` | `/api/correntistas` | Cadastra um correntista | `201 Created` |
-| `PUT` | `/api/correntistas/{id}` | Atualiza um correntista | `200 OK` |
-| `DELETE` | `/api/correntistas/{id}` | Exclui um correntista | `204 No Content` |
 
 #### Cadastrar um correntista
 
@@ -184,7 +191,6 @@ O CPF deve conter 11 dígitos e não pode pertencer a outro correntista.
 | `GET` | `/api/contas` | Lista todas as contas | `200 OK` |
 | `GET` | `/api/contas/{id}` | Busca uma conta pelo ID | `200 OK` |
 | `POST` | `/api/contas/{tipo}` | Abre uma conta | `201 Created` |
-| `DELETE` | `/api/contas/{id}` | Exclui uma conta | `204 No Content` |
 | `POST` | `/api/contas/{tipo}/{id}/depositar` | Realiza um depósito | `200 OK` |
 | `POST` | `/api/contas/{tipo}/{id}/sacar` | Realiza um saque | `200 OK` |
 | `POST` | `/api/contas/{tipo}/{id}/taxa` | Aplica juros ou rendimento | `200 OK` |
@@ -334,6 +340,20 @@ Todos os requisitos obrigatórios foram implementados, incluindo gerenciamento d
 Também foram implementados os diferenciais sugeridos: rendimento da poupança, juros da conta corrente, testes automatizados, Swagger/OpenAPI e tratamento padronizado de erros.
 
 Nenhum requisito obrigatório ou diferencial listado no desafio ficou pendente.
+
+### Processo de desenvolvimento
+
+O projeto foi evoluído em etapas pequenas e verificáveis:
+
+1. padronização dos erros da API;
+2. testes das regras de saque, depósito, juros e rendimento;
+3. encapsulamento das regras financeiras nas entidades;
+4. validação dos corpos das requisições e dos tipos de conta;
+5. configuração dos perfis H2 e MySQL com Docker;
+6. documentação da API com Swagger e exemplos no README;
+7. substituição de `double` por `BigDecimal` para valores monetários.
+
+Cada etapa foi registrada em commits separados e validada antes da próxima alteração.
 
 ## Autor
 

@@ -6,5 +6,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface CorrentistaRepository extends JpaRepository<Correntista,Long> {
     boolean existsByCpf(String cpf);
 
-    boolean existsByCpfAndIdNot(String cpf, Long id);
 }

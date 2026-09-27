@@ -1,8 +1,8 @@
 package org.example.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.example.exception.BusinessRuleException;
 
 import javax.persistence.Entity;
@@ -10,10 +10,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-
 public class ContaPoupanca extends Conta {
     @Override
     public void sacar(BigDecimal valor) {

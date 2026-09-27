@@ -3,7 +3,7 @@ package org.example.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.example.model.Transacao;
+import org.example.dto.TransacaoResponse;
 import org.example.service.TransacaoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,13 +23,13 @@ public class TransacaoController {
 
     @Operation(summary = "Lista todas as transações")
     @GetMapping
-    public ResponseEntity<List<Transacao>> listarTodas() {
+    public ResponseEntity<List<TransacaoResponse>> listarTodas() {
         return ResponseEntity.ok(transacaoService.listarTodas());
     }
 
     @Operation(summary = "Consulta o extrato de uma conta")
     @GetMapping("/conta/{contaId}")
-    public ResponseEntity<List<Transacao>> listarPorConta(@PathVariable Long contaId) {
+    public ResponseEntity<List<TransacaoResponse>> listarPorConta(@PathVariable Long contaId) {
         return ResponseEntity.ok(transacaoService.listarPorConta(contaId));
     }
 }

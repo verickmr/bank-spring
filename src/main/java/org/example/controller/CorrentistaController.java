@@ -44,18 +44,4 @@ public class CorrentistaController {
                 .body(service.salvar(dto));
     }
 
-    @Operation(summary = "Atualiza os dados de um correntista")
-    @PutMapping("/{id}")
-    public ResponseEntity<CorrentistaResponse> atualizar(
-            @PathVariable Long id,
-            @Valid @RequestBody CorrentistaRequest dto) {
-        return ResponseEntity.ok(service.atualizar(id, dto));
-    }
-
-    @Operation(summary = "Exclui um correntista")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        service.deletar(id);
-        return ResponseEntity.noContent().build();
-    }
 }

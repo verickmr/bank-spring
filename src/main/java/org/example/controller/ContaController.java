@@ -44,13 +44,6 @@ public class ContaController {
         return ResponseEntity.ok(contaService.buscarPorId(id));
     }
 
-    @Operation(summary = "Exclui uma conta")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        contaService.deletar(id);
-        return ResponseEntity.noContent().build();
-    }
-
     @Operation(summary = "Abre uma conta corrente ou poupança")
     @PostMapping("/{tipo}")
     public ResponseEntity<?> criarConta(

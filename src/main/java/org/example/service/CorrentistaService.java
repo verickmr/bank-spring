@@ -51,30 +51,6 @@ public class CorrentistaService {
         return toResponse(salvo);
     }
 
-    @Transactional
-    public CorrentistaResponse atualizar(Long id, CorrentistaRequest atualizado) {
-        Correntista existente = correntistaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Correntista não encontrado."));
-
-        if (correntistaRepository.existsByCpfAndIdNot(atualizado.getCpf(), id)) {
-            throw new ConflictException("Já existe um correntista com o CPF informado.");
-        }
-
-        existente.setNome(atualizado.getNome().trim());
-        existente.setCpf(atualizado.getCpf().trim());
-        existente.setEmail(atualizado.getEmail().trim().toLowerCase(Locale.ROOT));
-
-        Correntista salvo = correntistaRepository.save(existente);
-        return toResponse(salvo);
-    }
-
-    @Transactional
-    public void deletar(Long id) {
-        Correntista existente = correntistaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Correntista não encontrado."));
-        correntistaRepository.delete(existente);
-    }
-
     private void validarCpfDisponivel(String cpf) {
         if (correntistaRepository.existsByCpf(cpf)) {
             throw new ConflictException("Já existe um correntista com o CPF informado.");
