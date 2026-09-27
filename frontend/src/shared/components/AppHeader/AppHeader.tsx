@@ -1,7 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Link, NavLink, useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 import { tokenStorage } from '../../storage/tokenStorage'
 import { Brand } from '../Brand/Brand'
 
@@ -22,29 +21,7 @@ export function AppHeader() {
           <Brand />
         </Link>
 
-        <nav className="ml-auto flex items-center gap-1" aria-label="Navegação principal">
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) => cn(
-              'rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground',
-              isActive && 'bg-muted text-foreground',
-            )}
-          >
-            Contas
-          </NavLink>
-          <NavLink
-            to="/correntistas"
-            className={({ isActive }) => cn(
-              'rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground',
-              isActive && 'bg-muted text-foreground',
-            )}
-          >
-            Correntistas
-          </NavLink>
-        </nav>
-
-        <Button variant="outline" onClick={logout}>
+        <Button className="ml-auto" variant="outline" onClick={logout}>
           Sair
         </Button>
       </div>

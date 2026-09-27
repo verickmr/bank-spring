@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router'
 import { HttpError } from '../../shared/api/httpClient'
 import { createCustomer } from './customers.api'
@@ -12,12 +12,10 @@ type CreateCustomerNavigation = {
 
 export function useCreateCustomer({ redirectTo, state }: CreateCustomerNavigation) {
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
 
   return useMutation<Customer, HttpError, CustomerCreateFormData>({
     mutationFn: createCustomer,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['customers'] })
+    onSuccess: () => {
       navigate(redirectTo, { replace: true, state })
     },
   })

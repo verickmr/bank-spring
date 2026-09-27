@@ -9,7 +9,7 @@ import {
   type AccountCreateFormData,
 } from './accounts.schema'
 import { useCreateAccount } from './useCreateAccount'
-import { useCustomers } from '../customers/useCustomers'
+import { useCurrentCustomer } from '../customers/useCurrentCustomer'
 
 const selectClassName = 'h-9 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive'
 
@@ -24,8 +24,8 @@ function FieldError({ id, message }: { id: string; message?: string }) {
 }
 
 export function AccountForm() {
-  const customers = useCustomers()
-  const createAccount = useCreateAccount()
+  const customer = useCurrentCustomer()
+  const createAccount = useCreateAccount(customer.data?.id ?? 0)
   const {
     register,
     control,
@@ -36,7 +36,6 @@ export function AccountForm() {
     defaultValues: {
       tipo: 'corrente',
       numero: '',
-      correntistaId: 0,
       limite: undefined,
     },
   })
@@ -51,49 +50,20 @@ export function AccountForm() {
     )
   })
 
-  if (customers.isPending) {
-    return <div className="h-64 animate-pulse rounded-lg bg-muted" aria-label="Carregando correntistas" />
+  if (customer.isPending) {
+    return <div className="h-64 animate-pulse rounded-lg bg-muted" aria-label="Carregando cadastro" />
   }
 
-  if (customers.isError) {
+  if (customer.isError) {
     return (
       <Alert variant="destructive">
-        <AlertDescription>{customers.error.message}</AlertDescription>
-      </Alert>
-    )
-  }
-
-  if (customers.data.length === 0) {
-    return (
-      <Alert>
-        <AlertDescription>Cadastre um correntista antes de abrir uma conta.</AlertDescription>
+        <AlertDescription>{customer.error.message}</AlertDescription>
       </Alert>
     )
   }
 
   return (
     <form className="grid gap-5" onSubmit={submit} noValidate>
-      <div className="grid gap-2">
-        <Label htmlFor="correntistaId">Correntista</Label>
-        <select
-          id="correntistaId"
-          className={selectClassName}
-          {...register('correntistaId', {
-            setValueAs: (value: string) => Number(value),
-          })}
-          aria-invalid={Boolean(errors.correntistaId)}
-          aria-describedby={errors.correntistaId ? 'correntista-error' : undefined}
-        >
-          <option value={0}>Selecione um correntista</option>
-          {customers.data.map((customer) => (
-            <option key={customer.id} value={customer.id}>
-              {customer.nome} · {customer.cpf}
-            </option>
-          ))}
-        </select>
-        <FieldError id="correntista-error" message={errors.correntistaId?.message} />
-      </div>
-
       <div className="grid gap-2">
         <Label htmlFor="tipo">Tipo de conta</Label>
         <select id="tipo" className={selectClassName} {...register('tipo')}>

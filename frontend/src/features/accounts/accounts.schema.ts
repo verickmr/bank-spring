@@ -4,10 +4,6 @@ export const accountCreateSchema = z
   .object({
     tipo: z.enum(['corrente', 'poupanca']),
     numero: z.string().trim().min(1, 'Informe o número da conta.'),
-    correntistaId: z
-      .number()
-      .int()
-      .positive('Selecione um correntista.'),
     limite: z
       .number()
       .nonnegative('O limite não pode ser negativo.')

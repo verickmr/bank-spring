@@ -24,7 +24,7 @@ export function AccountCreatePage() {
           <CardHeader>
             <CardTitle>Abrir conta</CardTitle>
             <CardDescription>
-              Selecione o correntista e informe os dados da nova conta.
+              Informe os dados da nova conta vinculada ao seu cadastro.
             </CardDescription>
           </CardHeader>
           <CardContent>

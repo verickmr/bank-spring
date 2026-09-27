@@ -1,8 +1,15 @@
-import { request } from '../../shared/api/httpClient'
+import { HttpError, request } from '../../shared/api/httpClient'
 import type { CreateCustomerPayload, Customer } from './customers.types'
 
-export function listCustomers() {
-  return request<Customer[]>('/api/correntistas')
+export async function getCurrentCustomer() {
+  const customers = await request<Customer[]>('/api/correntistas')
+  const customer = customers[0]
+
+  if (!customer) {
+    throw new HttpError('Correntista autenticado não encontrado.', 404)
+  }
+
+  return customer
 }
 
 export function createCustomer(payload: CreateCustomerPayload) {

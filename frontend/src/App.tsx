@@ -4,8 +4,6 @@ import { AccountDetailsPage } from './features/accounts/AccountDetailsPage'
 import { DashboardPage } from './features/accounts/DashboardPage'
 import { LoginPage } from './features/auth/LoginPage'
 import { SignupPage } from './features/auth/SignupPage'
-import { CustomerCreatePage } from './features/customers/CustomerCreatePage'
-import { CustomersPage } from './features/customers/CustomersPage'
 import { ProtectedRoute } from './shared/routing/ProtectedRoute'
 import { tokenStorage } from './shared/storage/tokenStorage'
 
@@ -27,8 +25,6 @@ function App() {
         <Route index element={<DashboardPage />} />
         <Route path="contas/nova" element={<AccountCreatePage />} />
         <Route path="contas/:accountId" element={<AccountDetailsPage />} />
-        <Route path="correntistas" element={<CustomersPage />} />
-        <Route path="correntistas/novo" element={<CustomerCreatePage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

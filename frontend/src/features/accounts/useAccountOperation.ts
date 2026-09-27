@@ -18,7 +18,6 @@ export function useAccountOperation(account: Account) {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['accounts'] }),
         queryClient.invalidateQueries({ queryKey: ['transactions', account.id] }),
-        queryClient.invalidateQueries({ queryKey: ['customers'] }),
       ])
     },
   })

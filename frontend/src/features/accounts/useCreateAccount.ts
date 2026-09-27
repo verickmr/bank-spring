@@ -5,17 +5,17 @@ import { createAccount } from './accounts.api'
 import type { AccountCreateFormData } from './accounts.schema'
 import type { CreateAccountResponse } from './accounts.types'
 
-export function useCreateAccount() {
+export function useCreateAccount(customerId: number) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   return useMutation<CreateAccountResponse, HttpError, AccountCreateFormData>({
-    mutationFn: ({ tipo, ...payload }) => createAccount(tipo, payload),
+    mutationFn: ({ tipo, ...payload }) => createAccount(tipo, {
+      ...payload,
+      correntistaId: customerId,
+    }),
     onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['accounts'] }),
-        queryClient.invalidateQueries({ queryKey: ['customers'] }),
-      ])
+      await queryClient.invalidateQueries({ queryKey: ['accounts'] })
       navigate('/', {
         replace: true,
         state: { accountCreated: true },

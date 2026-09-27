@@ -6,4 +6,5 @@ export type Transaction = {
   valor: number
   data: string
   descricao: string
+  contaId?: number
 }
