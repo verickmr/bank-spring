@@ -124,7 +124,7 @@ class SecurityIntegrationTest {
                         .header(HttpHeaders.AUTHORIZATION, authorization))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].conta.id").value(contaPropria.getId()))
+                .andExpect(jsonPath("$[0].contaId").value(contaPropria.getId()))
                 .andExpect(jsonPath("$[0].descricao").value("Operação própria"));
 
         mockMvc.perform(get("/api/correntistas/" + outroCorrentista.getId())
