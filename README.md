@@ -22,14 +22,17 @@ O sistema gerencia correntistas, contas correntes, contas poupança e transaçõ
 - MySQL configurado com Docker Compose
 - Testes unitários e de controllers
 
-## Evoluções opcionais
+## Organização das branches
 
-A branch `main` contém a entrega base do desafio, com o escopo obrigatório e os diferenciais solicitados. Duas evoluções foram mantidas separadas para que a solução base continue simples de avaliar:
+As melhorias maiores foram separadas para manter a entrega obrigatória simples de executar e avaliar:
 
-- [`feat/autenticacao-jwt`](https://github.com/verickmr/bank-spring/tree/feat/autenticacao-jwt): adiciona Spring Security, senhas com BCrypt, login JWT, autorização por proprietário e migrações Flyway.
-- [`feat/frontend-react`](https://github.com/verickmr/bank-spring/tree/feat/frontend-react): parte da versão autenticada e adiciona a interface Conta Segura em React e TypeScript.
+| Branch | Conteúdo |
+|---|---|
+| [`main`](https://github.com/verickmr/bank-spring/tree/main) | API base completa, regras financeiras, testes, Swagger, H2 e MySQL com Docker |
+| [`feat/autenticacao-jwt`](https://github.com/verickmr/bank-spring/tree/feat/autenticacao-jwt) | Parte da `main` e adiciona Spring Security, BCrypt, login JWT, autorização por proprietário e Flyway |
+| [`feat/frontend-react`](https://github.com/verickmr/bank-spring/tree/feat/frontend-react) | Parte da versão autenticada e adiciona a interface Conta Segura em React e TypeScript |
 
-Essa separação permite executar e revisar somente a API pedida no desafio ou consultar as melhorias adicionais de forma independente.
+Essa progressão permite revisar primeiro o desafio de backend, depois a evolução de segurança e, por fim, a aplicação completa com interface web.
 
 ## Tecnologias
 
@@ -197,6 +200,8 @@ O CPF deve conter 11 dígitos e não pode pertencer a outro correntista.
 
 O parâmetro `{tipo}` aceita `corrente` ou `poupanca`.
 
+O tipo é enviado como parâmetro da rota para que conta corrente e conta poupança compartilhem os mesmos endpoints. O `ContaController` converte o texto com `TipoConta.fromString(tipo)` e utiliza um `switch` para encaminhar abertura, depósito, saque e aplicação de taxa ao serviço correspondente. Essa decisão reduz a duplicação de controllers e rotas, enquanto as regras específicas permanecem encapsuladas em `ContaCorrente` e `ContaPoupanca`.
+
 #### Abrir uma conta corrente
 
 ```http
@@ -326,6 +331,7 @@ O projeto está organizado nas seguintes responsabilidades:
 
 - `Conta` é uma classe abstrata especializada por `ContaCorrente` e `ContaPoupanca`.
 - A herança é persistida com a estratégia JPA `JOINED`.
+- O tipo da conta é recebido pela URL e um `switch` direciona a operação ao serviço correto, permitindo reutilizar o contrato REST para conta corrente e poupança.
 - As regras financeiras ficam nas entidades para preservar o encapsulamento do domínio.
 - Valores monetários usam `BigDecimal`, duas casas decimais e arredondamento `HALF_EVEN`.
 - Os serviços utilizam transações para manter a atualização do saldo e o registro da operação consistentes.
@@ -348,10 +354,11 @@ O projeto foi evoluído em etapas pequenas e verificáveis:
 1. padronização dos erros da API;
 2. testes das regras de saque, depósito, juros e rendimento;
 3. encapsulamento das regras financeiras nas entidades;
-4. validação dos corpos das requisições e dos tipos de conta;
-5. configuração dos perfis H2 e MySQL com Docker;
-6. documentação da API com Swagger e exemplos no README;
-7. substituição de `double` por `BigDecimal` para valores monetários.
+4. unificação das operações das duas contas por meio do parâmetro `tipo` e direcionamento com `switch`;
+5. validação dos corpos das requisições e dos tipos de conta;
+6. configuração dos perfis H2 e MySQL com Docker;
+7. documentação da API com Swagger e exemplos no README;
+8. substituição de `double` por `BigDecimal` para valores monetários.
 
 Cada etapa foi registrada em commits separados e validada antes da próxima alteração.
 
@@ -361,3 +368,4 @@ Cada etapa foi registrada em commits separados e validada antes da próxima alte
 
 - GitHub: [verickmr](https://github.com/verickmr)
 - E-mail: <verickmr.dev@gmail.com>
+
